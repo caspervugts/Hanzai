@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('welkom01'),
             'health' => '100',
             'exp' => '500000',
-            'money' => '25655500',
+            'money' => '25600',
         ]);
         
         DB::table('gangs')->insert([
