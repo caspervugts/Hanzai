@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatRoom = document.getElementById('chat-room');
     const messagesDiv = document.getElementById('messages');
     const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send');
     const inputContainer = document.getElementById('chat-input-container');
     const minimizeBtn = document.getElementById('chat-minimize');
 
@@ -95,20 +96,29 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchMessages();
     setInterval(fetchMessages, 3000);
 
-    // Verstuur bericht
-    input.addEventListener('keypress', async e => {
-        if (e.key === 'Enter' && input.value.trim() !== '') {
-            await fetch('/chat/messages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ message: input.value })
-            });
-            input.value = '';
-            fetchMessages();
+    async function sendMessage() {
+        const message = input.value.trim();
+        if (!message) return;
+
+        await fetch('/chat/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ message: input.value })
+        });
+
+        input.value = '';
+        fetchMessages();
+    }
+
+    input.addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+            sendMessage();
         }
     });
+
+    sendBtn.addEventListener('click', sendMessage);
 });
 </script>
