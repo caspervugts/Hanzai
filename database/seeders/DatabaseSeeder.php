@@ -180,6 +180,7 @@ class DatabaseSeeder extends Seeder
             Horses::class,
             Weapons::class,
             ChatMessages::class,
+            Races::class,
         ]);
     }
 }

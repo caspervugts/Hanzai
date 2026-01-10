@@ -86,7 +86,6 @@ class GamblingController extends Controller
             $race->closedate = $closeDate ;
             $race->save();
 
-            $id = $race->id;
             $race->horses()->attach([1, 2, 3, 4, 5, 6, 7, 8]);
             return;
         }
@@ -99,34 +98,25 @@ class GamblingController extends Controller
             $number = rand(1, 100);
             
             $horseOdds = $horse->odds*100;
-            #dd( $number." vs ".$horseOdds);
             if($number <= $horseOdds){
                 $winner = $horse;
-                #dd($number." vs ".$horseOdds    );
                 break;
-                #return $winner;
             }
 
             if ($i == 7){
                 $winner = $horses->values()[$i];
                 break;
-                #return $winner;
             }
         }
         
         $payoutHorses = 1 / $winner->odds;
-        #$betsOnWinner = Bet::with('horses')->where('horse_id', $winner->id, 'race_id', $race->id)->get();
         $betsonWinner = DB::select("SELECT * FROM bets WHERE horse_id = ".$winner->id." AND race_id = ".$race->id);
         $betsOnWinner = collect($betsonWinner);
-        
        
-       
-        #dd($betsOnWinner);
         foreach($betsOnWinner as $bet){
             $payoutAmount = $bet->amount * $payoutHorses;
             
             if(Race::where('id', $race->id) and $race->completed == 0 and User::where('id', $bet->user_id)){
-                #dd($payoutAmount); 
                 DB::table('users')
                 ->where('id', $bet->user_id)->increment('money', $payoutAmount);
             }
@@ -136,32 +126,6 @@ class GamblingController extends Controller
         DB::table('races')
             ->where('id', $race->id)
             ->update(['completed' => 1, 'winner' => $winner->id]);  
-        
-        // foreach($horses as $horse){
-        //     $number = rand(1, 100);
-        //     $horseOdds = $horse->odds*100;
-
-        //     if($number <= $horseOdds){
-        //         $winner = $horse->id;
-        //         #dd($winner);
-        //         break;
-        //         return $winner;
-        //     }
-            
-        // }
-        //not sure wat ik hier wou doen
-        /*for($i = 1; $i < 9; $i++){
-            DB::table('races')->insert([
-                'horse_id' => $i,
-                'closedate' => $closeDate           
-            ]);
-         }*/
-        
-        // $test = DB::table('races')->insert([
-        //     'closedate' => $closeDate     
-        // ]);      
-        
-        //dd($test);
 
         $race = new Race();
         $race->closedate = $closeDate ;
@@ -169,12 +133,6 @@ class GamblingController extends Controller
 
         $id = $race->id;
 
-        //$race = Race::where('id', 1)->last();
-
-        //var_dump($id);
-
         $race->horses()->attach([1, 2, 3, 4, 5, 6, 7, 8]);
-
-         
     }
 }
