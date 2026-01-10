@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\User;
+use App\Models\PvpItemEvent;
 use App\Models\Car;
 use DB;
 
@@ -32,8 +33,37 @@ class ProfileController extends Controller
         $user = User::find(Auth::user()->id);
         $weapons = $user->weapons;
 
+        $previousHits = DB::table('pvp_battle_instance')
+        ->where('completed', 1)
+        ->where('attacker_id', Auth::user()->id)
+        ->orWhere('defender_id', Auth::user()->id)            
+        ->orderBy('id', 'desc')->take(1)->get();
+        #dd($previousHits);
+
+        $previousHitsEvents = [];
+        foreach($previousHits as $hit){
+            $events = DB::table('pvp_battle_moves')
+            ->where('battle_instance_id', $hit->id)
+            ->get();
+            $previousHitsEvents[$hit->id] = $events;
+        }
+        #dd($previousHits);
+        
+        $eventDescriptions = [];
+        foreach($previousHitsEvents as $hitId => $events){
+            foreach($events as $event){
+                $eventDetail = PvpItemEvent::where('id', $event->move_event_id)->first();
+                // Store both the event detail and the user who made the move so the view can reference the move_user_id
+                $eventDescriptions[$hitId][] = (object)[
+                    'event_detail' => $eventDetail,
+                    'move_user_id' => $event->move_user_id,
+                    'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
+                ];
+            }
+        }
+
         return view('dashboard', [
-            'user' => $request->user(), 'weapons' => $weapons,
+            'user' => $request->user(), 'weapons' => $weapons, 'previousHits' => $previousHits, 'previousHitsEvents' => $previousHitsEvents, 'eventDescriptions' => $eventDescriptions
         ]);
     }
     

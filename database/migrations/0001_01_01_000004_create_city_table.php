@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pvp_battle_moves', function (Blueprint $table) {
+        Schema::create('cities', function (Blueprint $table) {
             $table->id()->primary();
-            $table->foreignId('battle_instance_id'); //instance_id
-            $table->foreignId('move_user_id'); //useer_id
-            $table->integer('move_event_id'); //item_event_id
-            $table->timestamps();
-        });
+            $table->string('name');
+            $table->string('description');
+        });    
+ 
     }
 
     /**
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pvp_battle_moves');
+        Schema::dropIfExists('cities');
     }
 };

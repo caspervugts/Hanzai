@@ -13,4 +13,9 @@ class Weapon extends Model
     {
         return $this->belongsToMany(User::class, 'user_weapon')->withPivot('ammo_amount');
     }
+
+    public function events()
+    {
+        return $this->hasMany(PvpItemEvent::class, 'item_id');
+    }
 }

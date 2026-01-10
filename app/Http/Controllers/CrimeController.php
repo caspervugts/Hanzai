@@ -7,6 +7,9 @@ use Illuminate\Http\Redirect;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Car;
+use App\Models\City;
+use App\Models\Weapon;
+use App\Models\PvpItemEvent;
 use Auth;
 use DB;
 
@@ -23,7 +26,40 @@ class CrimeController extends Controller
             $robbery = DB::table('crimes_robbery')->select('difficulty', 'description')->get();
             $cartheft = DB::table('crimes_cartheft')->select('difficulty', 'description')->get();
 
-            return view('crime', ['user' => $request->user(), 'robdata' => $robbery, 'cardata' => $cartheft]);
+            $allusers = DB::select("SELECT * FROM users WHERE health > 0 AND city = ".Auth::user()->city."");
+            $currentCity = City::where('id', Auth::user()->city)->first();
+
+            $previousHits = DB::table('pvp_battle_instance')
+            ->where('completed', 1)
+            ->where('attacker_id', Auth::user()->id)
+            ->orWhere('defender_id', Auth::user()->id)            
+            ->orderBy('id', 'desc')->take(1)->get();
+            #dd($previousHits);
+
+            $previousHitsEvents = [];
+            foreach($previousHits as $hit){
+                $events = DB::table('pvp_battle_moves')
+                ->where('battle_instance_id', $hit->id)
+                ->get();
+                $previousHitsEvents[$hit->id] = $events;
+            }
+            #dd($previousHits);
+            
+            $eventDescriptions = [];
+            foreach($previousHitsEvents as $hitId => $events){
+                foreach($events as $event){
+                    $eventDetail = PvpItemEvent::where('id', $event->move_event_id)->first();
+                    // Store both the event detail and the user who made the move so the view can reference the move_user_id
+                    $eventDescriptions[$hitId][] = (object)[
+                        'event_detail' => $eventDetail,
+                        'move_user_id' => $event->move_user_id,
+                        'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
+                    ];
+                }
+            }
+            #dd($eventDescriptions);
+
+            return view('crime', ['user' => $request->user(), 'robdata' => $robbery, 'cardata' => $cartheft, 'users' => $allusers, 'currentCity' => $currentCity, 'previousHits' => $previousHits, 'previousHitsEvents' => $previousHitsEvents, 'eventDescriptions' => $eventDescriptions]);
         }else{
              return view('jail', ['user' => $request->user()]);
         }
@@ -115,5 +151,161 @@ class CrimeController extends Controller
                 'rewardSentence' => $crime[0]->failure,
             ]);
         }
+    }
+    
+    public function scheduleHit($userId, Request $request){
+        $targetUser = User::where('id', $userId)->first();
+
+        if(!$targetUser){
+            return redirect()->route('crime')->with('error', 'User not found.');
+        }
+
+        db::table('pvp_battle_instance')->insert([
+            'attacker_id' => Auth::user()->id,
+            'defender_id' => $targetUser->id,
+            'battle_starttime' => Carbon::now()->addSeconds(600),
+        ]);
+       
+
+        return redirect()->route('crime')->with('success', 'Hit scheduled on ' . Carbon::now()->addSeconds(600) . '.');
+    }
+
+    public function performHit($hitId, Request $request){
+        //retrieve battle instance
+        $battleInstance = DB::table('pvp_battle_instance')->where('id', $hitId)->first();
+
+        // if(!$battleInstance){
+        //     return redirect()->route('crime')->with('error', 'Hit not found.'); 
+        // }
+        // if($battleInstance->completed == 0 && Carbon::now() < Carbon::parse($battleInstance->battle_starttime)){
+        //     return redirect()->route('crime')->with('error', 'Hit has already been scheduled.'); 
+        // }
+        //retrieve attacker and defender
+        $attacker = User::where('id', $battleInstance->attacker_id)->first();
+        $defender = User::where('id', $battleInstance->defender_id)->first();
+        
+        //retrieve inventory items (weapons) for both users
+        $attackerWeapons = $attacker->weapons;
+        $defenderWeapons = $defender->weapons;  
+
+//  Je bent gespot door de spooky skelet 
+//               _.---._
+//              .'       `.
+//              :)       (:
+//              \ (@) (@) /
+//               \   A   /
+//                )     (
+//                \"""""/
+//                 `._.'
+//                  .=.
+//          .---._.-.=.-._.---.
+//         / ':-(_.-: :-._)-:` \
+//        / /' (__.-: :-.__) `\ \
+//       / /  (___.-` '-.___)  \ \
+//      / /   (___.-'^`-.___)   \ \
+//     / /    (___.-'=`-.___)    \ \
+//    / /     (____.'=`.____)     \ \
+//   / /       (___.'=`.___)       \ \
+//  (_.;       `---'.=.`---'       ;._)
+//  ;||        __  _.=._  __        ||;
+//  ;||       (  `.-.=.-.'  )       ||;
+//  ;||       \    `.=.'    /       ||;
+//  ;||        \    .=.    /        ||;
+//  ;||       .-`.`-._.-'.'-.       ||;
+// .:::\      ( ,): O O :(, )      /:::.
+// |||| `     / /'`--'--'`\ \     ' ||||
+// ''''      / /           \ \      ''''
+//          / /             \ \
+//         / /               \ \
+//        / /                 \ \
+//       / / Fix binnen 30 min \ \
+//      / / 3 bugs of de spooky \ \
+//     /.' skelet zal vanavond   `.\
+//    (_)'   voor je bed staan   `(_)
+//     \\.                       .//
+//      \\.                     .//
+//       \\.                   .//
+//        \\.                 .//
+//         \\.               .//
+//          \\.             .//
+//           \\.           .//
+//           ///)         (\\\
+//         ,///'           `\\\,
+//        ///'               `\\\
+//       ""'                   '""
+
+        foreach($attackerWeapons as $weapon){
+            $events = $weapon->events;
+            #dd($events);
+            foreach($events as $event){
+                //process each event based on its chance
+                $roll = rand(1, 100);
+                if($roll <= $event->event_chance){
+                    DB::table('pvp_battle_moves')->insert([
+                        'battle_instance_id' => $battleInstance->id,
+                        'move_user_id' => $attacker->id,
+                        'move_event_id' => $event->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
+
+                    //remove attackerweapons
+                    DB::table('user_weapon')
+                    ->where('user_id', $attacker->id)
+                    ->where('weapon_id', $weapon->id)
+                    ->delete();
+
+                    //apply event effects
+                    if($event->event_recipient == 2){ //target
+                        DB::table('users')
+                        ->where('id', $defender->id)
+                        ->decrement('health', $event->event_damage);
+                    }elseif($event->event_recipient == 1){ //self
+                        DB::table('users')
+                        ->where('id', $attacker->id)
+                        ->decrement('health', $event->event_damage);
+                    }
+                }
+            }
+        }
+
+        foreach($defenderWeapons as $weapon){
+            $events = $weapon->events;
+            foreach($events as $event){
+                //process each event based on its chance
+                $roll = rand(1, 100);
+                if($roll <= $event->event_chance){
+                    DB::table('pvp_battle_moves')->insert([
+                        'battle_instance_id' => $battleInstance->id,
+                        'move_user_id' => $defender->id,
+                        'move_event_id' => $event->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
+
+                    //remove defender weapons
+                    DB::table('user_weapon')
+                    ->where('user_id', $defender->id)
+                    ->where('weapon_id', $weapon->id)
+                    ->delete();
+
+                    //apply event effects
+                    if($event->event_recipient == 2){ //target
+                        DB::table('users')
+                        ->where('id', $attacker->id)
+                        ->decrement('health', $event->event_damage);
+                    }elseif($event->event_recipient == 1){ //self
+                        DB::table('users')
+                        ->where('id', $defender->id)
+                        ->decrement('health', $event->event_damage);
+                    }
+                }
+            }
+        }
+
+        //update battle instance as completed
+        DB::table('pvp_battle_instance')
+        ->where('id', $battleInstance->id)
+        ->update(['completed' => 1]);  
     }
 }

@@ -39,5 +39,105 @@ class Weapons extends Seeder
             'ammo' => '7.62mm',    
             'value' => '150000'
         ]);
+
+        //glock-17 events
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '1', // Glock-17
+            'event_description' => ' fired a shot from his/her Glock-17 and hit his/her target in the arm dealing 2 damage.',
+            'event_chance' => '70',
+            'event_damage' => '2',
+            'event_recipient' => '2'
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '1', // Glock-17
+            'event_description' => ' fired a shot from his/her Glock-17 and hit his/her target in the head dealing 25 damage.',
+            'event_chance' => '10',
+            'event_damage' => '25',
+            'event_recipient' => '2' 
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '1', // Glock-17
+            'event_description' => ' fired a shot from his/her Glock-17 and missed his/her target completely.',
+            'event_chance' => '50',
+            'event_damage' => '0',
+            'event_recipient' => '2' 
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '1', // Glock-17
+            'event_description' => ' fired a shot from his/her Glock-17 and shot yourself in the foot dealing 5 damage. Stupid ass.',
+            'event_chance' => '15',
+            'event_damage' => '5',
+            'event_recipient' => '1' 
+        ]); 
+        
+
+        //ak47 events
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '4', // Ak-47
+            'event_description' => ' fired a shot from his/her Ak-47 and hit his/her target in the arm dealing 25 damage.',
+            'event_chance' => '70',
+            'event_damage' => '25',
+            'event_recipient' => '2'
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '4', // Ak-47  
+            'event_description' => ' fired a shot from his/her Ak-47 and hit his/her target in the head dealing 85 damage.',
+            'event_chance' => '10',
+            'event_damage' => '85',
+            'event_recipient' => '2' 
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '4', // Ak-47
+            'event_description' => ' fired a shot from his/her Ak-47 and missed his/her target completely.',
+            'event_chance' => '50',
+            'event_damage' => '0',
+            'event_recipient' => '2' 
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '4', // Ak-47
+            'event_description' => ' fired a shot from his/her Ak-47. The bullet ricocheted off the wall and hits yourself in the leg dealing 25 damage. Unlucky.',
+            'event_chance' => '15',
+            'event_damage' => '25',
+            'event_recipient' => '1' 
+        ]); 
+
+        //Knife events
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '3', // Knife
+            'event_description' => ' stabbed his/her target in the arm dealing 2 damage.',
+            'event_chance' => '70',
+            'event_damage' => '2',
+            'event_recipient' => '2'
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '3', // Knife
+            'event_description' => ' stabbed his/her target in the head dealing 10 damage.',
+            'event_chance' => '10',
+            'event_damage' => '10',
+            'event_recipient' => '2' 
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '3', // Knife
+            'event_description' => ' hurt yourself trying to stab his/her target.',
+            'event_chance' => '20',
+            'event_damage' => '2',
+            'event_recipient' => '1'
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '3', // Knife
+            'event_description' => ' stabbed his/her target in the leg dealing 4 damage.',
+            'event_chance' => '70',
+            'event_damage' => '4',
+            'event_recipient' => '2'
+        ]); 
     }
 }

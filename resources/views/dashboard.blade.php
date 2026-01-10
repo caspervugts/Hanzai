@@ -81,33 +81,27 @@
                 </div>                
             </div>
             <br>
+        </div>
+    </div>
+    <br/>
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-black-900">
+                    {{ __("Previous Hit Log") }}  
+                                                   
+                </div>  
                 <div class="p-6 text-gray-900">
-                    <!-- <img src="{{ asset('images/japan.svg') }}" alt="Your SVG"> -->
-                    {!! file_get_contents(public_path('images/japan.svg')) !!}
-                    <!-- <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>     -->
-                    <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"></svg>
-                </div>                
+                    @foreach($previousHitsEvents as $hitId => $events)
+                        <div>
+                            <strong>Latest combat: </strong>
+                            <ul>
+                                @foreach($eventDescriptions[$hitId] as $event)
+                                    <li>{{ $event->move_user_name }} {{ $event->event_detail->event_description }} </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <br/>
+                    @endforeach
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="dropdown">
-        <button class="dropbtn">Dropdown</button>
-        <div class="dropdown-content">
-            <a href="#">Link 1</a>
-            <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
-        </div>
-    </div>
-    <script>
-        document.getElementsByClassName('test').addEventListener('mouseenter', function() {
-            this.setAttribute('fill', 'red');
-        });
-
-        document.getElementsByClassName('test').addEventListener('mouseleave', function() {
-            this.setAttribute('fill', 'blue');
-        });
-    </script>
 </x-app-layout>

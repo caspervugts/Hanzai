@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('attacker_id'); //user id
             $table->foreignId('defender_id'); //user id
             $table->datetime('battle_starttime');
+            $table->integer('completed')->default(0);
             $table->timestamps();
         });
     }
