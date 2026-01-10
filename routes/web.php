@@ -37,6 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/gambling', [GamblingController::class, 'view'])->name('gambling');    
     Route::get('/gambling/race', [GamblingController::class, 'createRace']);    
     Route::post('/gambling/placebet/{horseId}', [GamblingController::class, 'placeBet']);    
+
+    Route::get('/leaderboard', [ProfileController::class, 'leaderboard'])->name('leaderboard');  
     
     Route::get('/chat/messages', [ChatRoomController::class, 'view']);
     Route::post('/chat/messages', [ChatRoomController::class, 'store']);
