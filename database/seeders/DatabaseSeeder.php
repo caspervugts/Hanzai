@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('starcraft'),
             'health' => '100',
             'exp' => '50',
-            'money' => '100',
+            'money' => '50000',
         ]);
 
         DB::table('users')->insert([

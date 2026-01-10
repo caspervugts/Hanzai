@@ -67,7 +67,7 @@ class Weapons extends Seeder
 
         DB::table('pvp_item_events')->insert([
             'item_id' => '1', // Glock-17
-            'event_description' => ' fired a shot from his/her Glock-17 and shot yourself in the foot dealing 5 damage. Stupid ass.',
+            'event_description' => ' fired a shot from his/her Glock-17 and shot himself/herself in the foot dealing 5 damage. Stupid ass.',
             'event_chance' => '15',
             'event_damage' => '5',
             'event_recipient' => '1' 
@@ -101,7 +101,7 @@ class Weapons extends Seeder
 
         DB::table('pvp_item_events')->insert([
             'item_id' => '4', // Ak-47
-            'event_description' => ' fired a shot from his/her Ak-47. The bullet ricocheted off the wall and hits yourself in the leg dealing 25 damage. Unlucky.',
+            'event_description' => ' fired a shot from his/her Ak-47. The bullet ricocheted off the wall and hits himself/herself in the leg dealing 25 damage. Unlucky.',
             'event_chance' => '15',
             'event_damage' => '25',
             'event_recipient' => '1' 
@@ -126,7 +126,7 @@ class Weapons extends Seeder
 
         DB::table('pvp_item_events')->insert([
             'item_id' => '3', // Knife
-            'event_description' => ' hurt yourself trying to stab his/her target.',
+            'event_description' => ' hurt himself/herself trying to stab his/her target.',
             'event_chance' => '20',
             'event_damage' => '2',
             'event_recipient' => '1'

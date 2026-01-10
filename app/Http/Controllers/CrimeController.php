@@ -187,119 +187,170 @@ class CrimeController extends Controller
         //retrieve inventory items (weapons) for both users
         $attackerWeapons = $attacker->weapons;
         $defenderWeapons = $defender->weapons;  
-
-//  Je bent gespot door de spooky skelet 
-//               _.---._
-//              .'       `.
-//              :)       (:
-//              \ (@) (@) /
-//               \   A   /
-//                )     (
-//                \"""""/
-//                 `._.'
-//                  .=.
-//          .---._.-.=.-._.---.
-//         / ':-(_.-: :-._)-:` \
-//        / /' (__.-: :-.__) `\ \
-//       / /  (___.-` '-.___)  \ \
-//      / /   (___.-'^`-.___)   \ \
-//     / /    (___.-'=`-.___)    \ \
-//    / /     (____.'=`.____)     \ \
-//   / /       (___.'=`.___)       \ \
-//  (_.;       `---'.=.`---'       ;._)
-//  ;||        __  _.=._  __        ||;
-//  ;||       (  `.-.=.-.'  )       ||;
-//  ;||       \    `.=.'    /       ||;
-//  ;||        \    .=.    /        ||;
-//  ;||       .-`.`-._.-'.'-.       ||;
-// .:::\      ( ,): O O :(, )      /:::.
-// |||| `     / /'`--'--'`\ \     ' ||||
-// ''''      / /           \ \      ''''
-//          / /             \ \
-//         / /               \ \
-//        / /                 \ \
-//       / / Fix binnen 30 min \ \
-//      / / 3 bugs of de spooky \ \
-//     /.' skelet zal vanavond   `.\
-//    (_)'   voor je bed staan   `(_)
-//     \\.                       .//
-//      \\.                     .//
-//       \\.                   .//
-//        \\.                 .//
-//         \\.               .//
-//          \\.             .//
-//           \\.           .//
-//           ///)         (\\\
-//         ,///'           `\\\,
-//        ///'               `\\\
-//       ""'                   '""
+        #dd($attackerWeapons);
+        //  Je bent gespot door de spooky skelet 
+        //               _.---._
+        //              .'       `.
+        //              :)       (:
+        //              \ (@) (@) /
+        //               \   A   /
+        //                )     (
+        //                \"""""/
+        //                 `._.'
+        //                  .=.
+        //          .---._.-.=.-._.---.
+        //         / ':-(_.-: :-._)-:` \
+        //        / /' (__.-: :-.__) `\ \
+        //       / /  (___.-` '-.___)  \ \
+        //      / /   (___.-'^`-.___)   \ \
+        //     / /    (___.-'=`-.___)    \ \
+        //    / /     (____.'=`.____)     \ \
+        //   / /       (___.'=`.___)       \ \
+        //  (_.;       `---'.=.`---'       ;._)
+        //  ;||        __  _.=._  __        ||;
+        //  ;||       (  `.-.=.-.'  )       ||;
+        //  ;||       \    `.=.'    /       ||;
+        //  ;||        \    .=.    /        ||;
+        //  ;||       .-`.`-._.-'.'-.       ||;
+        // .:::\      ( ,): O O :(, )      /:::.
+        // |||| `     / /'`--'--'`\ \     ' ||||
+        // ''''      / /           \ \      ''''
+        //          / /             \ \
+        //         / /               \ \
+        //        / /                 \ \
+        //       / / Fix binnen 30 min \ \
+        //      / / 3 bugs of de spooky \ \
+        //     /.' skelet zal vanavond   `.\
+        //    (_)'   voor je bed staan   `(_)
+        //     \\.                       .//
+        //      \\.                     .//
+        //       \\.                   .//
+        //        \\.                 .//
+        //         \\.               .//
+        //          \\.             .//
+        //           \\.           .//
+        //           ///)         (\\\
+        //         ,///'           `\\\,
+        //        ///'               `\\\
+        //       ""'                   '""
 
         foreach($attackerWeapons as $weapon){
             $events = $weapon->events;
-            #dd($events);
-            foreach($events as $event){
-                //process each event based on its chance
-                $roll = rand(1, 100);
-                if($roll <= $event->event_chance){
-                    DB::table('pvp_battle_moves')->insert([
-                        'battle_instance_id' => $battleInstance->id,
-                        'move_user_id' => $attacker->id,
-                        'move_event_id' => $event->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
+            if(empty($events) || count($events) == 0){
+                continue; // nothing to do for this weapon
+            }
 
-                    //remove attackerweapons
-                    DB::table('user_weapon')
-                    ->where('user_id', $attacker->id)
-                    ->where('weapon_id', $weapon->id)
-                    ->delete();
+            // Choose a single event per weapon using event_chance as a weight
+            $weighted = [];
+            foreach($events as $ev){
+                $weighted[] = ['event' => $ev, 'weight' => max(0, (int)$ev->event_chance)];
+            }
 
-                    //apply event effects
-                    if($event->event_recipient == 2){ //target
-                        DB::table('users')
-                        ->where('id', $defender->id)
-                        ->decrement('health', $event->event_damage);
-                    }elseif($event->event_recipient == 1){ //self
-                        DB::table('users')
-                        ->where('id', $attacker->id)
-                        ->decrement('health', $event->event_damage);
+            $totalWeight = array_sum(array_column($weighted, 'weight'));
+            if($totalWeight <= 0){
+                // fallback to uniform random if no weights
+                $selectedEvent = $events[array_rand($events)];
+            }else{
+                $r = rand(1, $totalWeight);
+                $cum = 0;
+                $selectedEvent = null;
+                foreach($weighted as $w){
+                    $cum += $w['weight'];
+                    if($r <= $cum){
+                        $selectedEvent = $w['event'];
+                        break;
                     }
                 }
+                if(!$selectedEvent){
+                    // safety fallback
+                    $selectedEvent = end($events);
+                }
+            }
+
+            // record the move
+            DB::table('pvp_battle_moves')->insert([
+                'battle_instance_id' => $battleInstance->id,
+                'move_user_id' => $attacker->id,
+                'move_event_id' => $selectedEvent->id,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+
+            //remove attacker weapon
+            DB::table('user_weapon')
+                ->where('user_id', $attacker->id)
+                ->where('weapon_id', $weapon->id)
+                ->delete();
+
+            //apply event effects
+            if($selectedEvent->event_recipient == 2){ //target
+                DB::table('users')
+                    ->where('id', $defender->id)
+                    ->decrement('health', $selectedEvent->event_damage);
+            }elseif($selectedEvent->event_recipient == 1){ //self
+                DB::table('users')
+                    ->where('id', $attacker->id)
+                    ->decrement('health', $selectedEvent->event_damage);
             }
         }
 
         foreach($defenderWeapons as $weapon){
             $events = $weapon->events;
-            foreach($events as $event){
-                //process each event based on its chance
-                $roll = rand(1, 100);
-                if($roll <= $event->event_chance){
-                    DB::table('pvp_battle_moves')->insert([
-                        'battle_instance_id' => $battleInstance->id,
-                        'move_user_id' => $defender->id,
-                        'move_event_id' => $event->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
+            if(empty($events) || count($events) == 0){
+                continue; // nothing to do for this weapon
+            }
 
-                    //remove defender weapons
-                    DB::table('user_weapon')
-                    ->where('user_id', $defender->id)
-                    ->where('weapon_id', $weapon->id)
-                    ->delete();
+            // Choose a single event per weapon using event_chance as a weight
+            $weighted = [];
+            foreach($events as $ev){
+                $weighted[] = ['event' => $ev, 'weight' => max(0, (int)$ev->event_chance)];
+            }
 
-                    //apply event effects
-                    if($event->event_recipient == 2){ //target
-                        DB::table('users')
-                        ->where('id', $attacker->id)
-                        ->decrement('health', $event->event_damage);
-                    }elseif($event->event_recipient == 1){ //self
-                        DB::table('users')
-                        ->where('id', $defender->id)
-                        ->decrement('health', $event->event_damage);
+            $totalWeight = array_sum(array_column($weighted, 'weight'));
+            if($totalWeight <= 0){
+                // fallback to uniform random if no weights
+                $selectedEvent = $events[array_rand($events)];
+            }else{
+                $r = rand(1, $totalWeight);
+                $cum = 0;
+                $selectedEvent = null;
+                foreach($weighted as $w){
+                    $cum += $w['weight'];
+                    if($r <= $cum){
+                        $selectedEvent = $w['event'];
+                        break;
                     }
                 }
+                if(!$selectedEvent){
+                    // safety fallback
+                    $selectedEvent = end($events);
+                }
+            }
+
+            // record the move
+            DB::table('pvp_battle_moves')->insert([
+                'battle_instance_id' => $battleInstance->id,
+                'move_user_id' => $defender->id,
+                'move_event_id' => $selectedEvent->id,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+
+            //remove defender weapon
+            DB::table('user_weapon')
+                ->where('user_id', $defender->id)
+                ->where('weapon_id', $weapon->id)
+                ->delete();
+
+            //apply event effects
+            if($selectedEvent->event_recipient == 2){ //target
+                DB::table('users')
+                    ->where('id', $attacker->id)
+                    ->decrement('health', $selectedEvent->event_damage);
+            }elseif($selectedEvent->event_recipient == 1){ //self
+                DB::table('users')
+                    ->where('id', $defender->id)
+                    ->decrement('health', $selectedEvent->event_damage);
             }
         }
 
