@@ -22,6 +22,8 @@ return new class extends Migration
             $table->integer('health')->default(100);
             $table->integer('exp')->default(0);
             $table->integer('gang_exp')->default(0);
+            //cooldown voor hits -> 1 is cooldown active, 0 is geen cooldown
+            $table->integer('cooldown')->default(0);
             $table->integer('money')->default(50);
             $table->rememberToken();
             $table->timestamps();

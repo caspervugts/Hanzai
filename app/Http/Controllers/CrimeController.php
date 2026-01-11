@@ -156,9 +156,26 @@ class CrimeController extends Controller
     public function scheduleHit($userId, Request $request){
         $targetUser = User::where('id', $userId)->first();
 
+        $scheduledAttack = DB::table('pvp_battle_instance')->where('completed', 0)->where('attacker_id', Auth::user()->id)->first();
+        if($scheduledAttack){
+            #dd($scheduledAttack);
+            return redirect()->route('crime')->with('error', 'You already have a scheduled hit.');
+        }
+
         if(!$targetUser){
             return redirect()->route('crime')->with('error', 'User not found.');
         }
+        if($targetUser->cooldown == 1){
+            return redirect()->route('crime')->with('error', 'User is already targeted for a hit.');
+        }
+
+        if(Auth::user()->cooldown == 1){
+            return redirect()->route('crime')->with('error', 'You are already feel something bad is going to happen soon..');
+        }
+
+        //update cooldown voor users
+        DB::table('users')->where('id', Auth::user()->id)->update(['cooldown' => 1]);
+        DB::table('users')->where('id',$userId)->update(['cooldown' => 1]);
 
         db::table('pvp_battle_instance')->insert([
             'attacker_id' => Auth::user()->id,
@@ -347,10 +364,12 @@ class CrimeController extends Controller
                 DB::table('users')
                     ->where('id', $attacker->id)
                     ->decrement('health', $selectedEvent->event_damage);
+                DB::table('users')->where('id', $attacker->id)->update(['cooldown' => 0]); //reset cooldown after being attacked (dit moet in de toekomst anders)
             }elseif($selectedEvent->event_recipient == 1){ //self
                 DB::table('users')
                     ->where('id', $defender->id)
                     ->decrement('health', $selectedEvent->event_damage);
+                DB::table('users')->where('id', $defender->id)->update(['cooldown' => 0]); //reset cooldown (dit moet in the toekomst anders)
             }
         }
 
