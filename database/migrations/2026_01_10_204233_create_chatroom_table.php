@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('chat_messages', function (Blueprint $table) {
             $table->id()->primary();
             $table->foreignId('user_id');
+            $table->string('chat_type'); // all, gang,
+            $table->integer('gang_id')->nullable();
             $table->string('message');
             $table->timestamp('created_at')->useCurrent();
         });

@@ -14,12 +14,24 @@ class ChatRoomController extends Controller
 {
     public function view()
     {              
-        $messages = ChatMessage::with('user')->latest()->take(50)->get()->reverse();
+        $messages = ChatMessage::with('user', 'user.gang')
+        ->where(function($query) {
+            $query->where('chat_type', 'all')
+            ->orWhere(function($query) {
+                $query->where('chat_type', 'gang')
+                      ->where('gang_id', Auth::user()->gang_id);
+            });
+        })
+        ->latest()
+        ->take(50)
+        ->get()
+        ->reverse();
         
         $messages = $messages->map(function($msg) {
             return [
                 'id' => $msg->id,
                 'user' => $msg->user,
+                'chat_type' => $msg->chat_type,
                 'message' => $msg->message,
                 'created_at' => Carbon::parse($msg->created_at)->format('H:i'),
             ];
@@ -31,11 +43,14 @@ class ChatRoomController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'chat_type' => 'required|in:all,gang',
             'message' => 'required|string|max:500',
         ]);
 
         $message = ChatMessage::create([
             'user_id' => Auth::user()->id,
+            'chat_type' => $request->chat_type,
+            'gang_id' => Auth::user()->gang_id ?? null,
             'message' => $request->message,
         ]);
 
