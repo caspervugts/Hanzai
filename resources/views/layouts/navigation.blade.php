@@ -52,6 +52,12 @@
                         {{ __('Gangs') }}
                     </x-nav-link>
                 </div>  
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">
+                        {{ __('Leaderboards') }}
+                    </x-nav-link>
+                </div>
             </div>
 
             <!-- Settings Dropdown -->
@@ -120,6 +126,39 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
+                <!-- Navigation Links -->
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-responsive-nav-link>
+                
+
+                <x-responsive-nav-link :href="route('crime')" :active="request()->routeIs('crime')">
+                        {{ __('Crime') }}
+                    </x-responsive-nav-link>
+                               
+
+                <x-responsive-nav-link :href="route('garage')" :active="request()->routeIs('garage')">
+                        {{ __('Garage') }}
+                    </x-responsive-nav-link>
+                  
+
+                <x-responsive-nav-link :href="route('shop')" :active="request()->routeIs('shop')">
+                        {{ __('Shop') }}
+                    </x-responsive-nav-link>
+                
+                
+                <x-responsive-nav-link :href="route('gambling')" :active="request()->routeIs('gambling')">
+                        {{ __('Gambling') }}
+                    </x-responsive-nav-link>
+                 
+
+                <x-responsive-nav-link :href="route('gang')" :active="request()->routeIs('gang')">
+                        {{ __('Gangs') }}
+                    </x-responsive-nav-link>
+             
+                <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">
+                        {{ __('Leaderboards') }}
+                    </x-responsive-nav-link>
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

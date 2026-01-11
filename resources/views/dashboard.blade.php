@@ -57,14 +57,24 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{ __("Welcome") }} {{ $user->name }} <br/>
+                    {{ __("Welcome back") }} {{ $user->name }} <br/>
                     {{ __("Health") }} {{ $user->health }} <br/>
                     {{ __("Experience") }} {{ $user->exp }} <br/>
-                    {{ __("Money") }} {{ $user->money }} <br/>
-                    @if ($user->exp <= 49)
-                        Nobody
-                    @elseif ($user->exp < 100 and $user->exp > 49)
-                        Bosozoku                
+                    {{ __("Money") }} ¥{{ number_format($user->money) }} <br/>
+                    @if ($user->exp >= 0 and $user->exp < 99)
+                        Rank: <b>Nobody</b>
+                    @elseif ($user->exp < 250)
+                        Rank: <b>Bosozoku</b>           
+                    @elseif ($user->exp < 500)
+                        Rank: <b>Shatei</b> 
+                    @elseif ($user->exp < 1000)
+                        Rank: <b>Kyodai</b> 
+                    @elseif ($user->exp < 2000)
+                        Rank: <b>Shateeigashira</b> 
+                    @elseif ($user->exp < 5000)
+                        Rank: <b>Wakagashira</b> 
+                    @elseif ($user->exp > 5000)
+                        Rank: <b>Oyabun</b> 
                     @endif
                     
                 </div>                
@@ -74,7 +84,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{ __("Inventory") }}  <br/>
+                    <b>{{ __("Inventory") }}  </b><br/>
                     @foreach ($weapons as $weapon)
                         <p>{{ $weapon->name }}  </p>
                     @endforeach      

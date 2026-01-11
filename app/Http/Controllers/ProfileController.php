@@ -67,6 +67,15 @@ class ProfileController extends Controller
         ]);
     }
     
+    public function leaderboard(Request $request): View
+    {
+        $users = User::orderBy('money', 'desc')->get();
+
+        return view('leaderboard', [
+            'users' => $users,
+        ]);
+    }
+
     public function viewGarage(Request $request): View
     {
         $user = User::find(Auth::user()->id);
