@@ -202,6 +202,34 @@ class DatabaseSeeder extends Seeder
             'performance' => '10'
         ]);
 
+        DB::table('foods')->insert([
+            'name' => 'Onigiri',
+            'description' => 'A traditional Japanese rice ball, often wrapped in seaweed and filled with savory ingredients.',
+            'health_restore' => '2',
+            'value' => '1000'
+        ]);
+
+        DB::table('foods')->insert([
+            'name' => 'Instant Noodles',
+            'description' => 'A quick and easy meal option, often flavored with various seasonings and toppings.',
+            'health_restore' => '5',
+            'value' => '2000'
+        ]);
+
+        DB::table('foods')->insert([
+            'name' => 'Packed French Toast',
+            'description' => 'A delicious breakfast item made by soaking bread in a mixture of eggs and milk.',
+            'health_restore' => '14',
+            'value' => '5000'
+        ]);
+
+        DB::table('foods')->insert([
+            'name' => 'Japanese Bento Box',
+            'description' => 'A balanced meal typically consisting of rice, fish or meat, and pickled or cooked vegetables, all neatly packed in a box.',
+            'health_restore' => '30',
+            'value' => '10000'
+        ]);
+
         $this->call([
             Horses::class,
             Weapons::class,

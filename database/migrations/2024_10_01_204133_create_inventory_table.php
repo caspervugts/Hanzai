@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('weapons', function (Blueprint $table) {
             $table->id()->primary();
             $table->string('name');
+            $table->string('description');
             $table->integer('value');
             $table->string('ammo')->nullable();
             $table->integer('damage');

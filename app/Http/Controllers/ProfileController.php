@@ -25,6 +25,48 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function help(Request $request): View
+    {
+        return view('help', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    public function death(Request $request): View
+    {
+        $combatLogs = DB::table('pvp_battle_instance')
+            ->where('attacker_id', Auth::user()->id)
+            ->orWhere('defender_id', Auth::user()->id)            
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $HitsEvents = [];
+        foreach($combatLogs as $hit){
+            $events = DB::table('pvp_battle_moves')
+            ->where('battle_instance_id', $hit->id)
+            ->get();
+            $HitsEvents[$hit->id] = $events;
+        }
+        #dd($previousHits);
+        
+        $eventDescriptions = [];
+        foreach($HitsEvents as $hitId => $events){
+            foreach($events as $event){
+                $eventDetail = PvpItemEvent::where('id', $event->move_event_id)->first();
+                // Store both the event detail and the user who made the move so the view can reference the move_user_id
+                $eventDescriptions[$hitId][] = (object)[
+                    'event_detail' => $eventDetail,
+                    'move_user_id' => $event->move_user_id,
+                    'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
+                ];
+            }
+        }
+
+        return view('death', [
+            'user' => $request->user(), 'combats' => $combatLogs, 'HitsEvents' => $HitsEvents, 'eventDescriptions' => $eventDescriptions
+        ]);
+    }
+
     /**
      * Display the user's profile form.
      */
@@ -141,5 +183,40 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function combatlog(Request $request): View
+    {
+        $combatLogs = DB::table('pvp_battle_instance')
+            ->where('attacker_id', Auth::user()->id)
+            ->orWhere('defender_id', Auth::user()->id)            
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $HitsEvents = [];
+        foreach($combatLogs as $hit){
+            $events = DB::table('pvp_battle_moves')
+            ->where('battle_instance_id', $hit->id)
+            ->get();
+            $HitsEvents[$hit->id] = $events;
+        }
+        #dd($previousHits);
+        
+        $eventDescriptions = [];
+        foreach($HitsEvents as $hitId => $events){
+            foreach($events as $event){
+                $eventDetail = PvpItemEvent::where('id', $event->move_event_id)->first();
+                // Store both the event detail and the user who made the move so the view can reference the move_user_id
+                $eventDescriptions[$hitId][] = (object)[
+                    'event_detail' => $eventDetail,
+                    'move_user_id' => $event->move_user_id,
+                    'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
+                ];
+            }
+        }
+
+        return view('combatlog', [
+            'combats' => $combatLogs, 'HitsEvents' => $HitsEvents, 'eventDescriptions' => $eventDescriptions
+        ]);
     }
 }
