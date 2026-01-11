@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             'health' => '100',
             'exp' => '50',
             'money' => '50000',
+            'gang_id' => '2'
         ]);
 
         DB::table('users')->insert([
@@ -44,6 +45,7 @@ class DatabaseSeeder extends Seeder
             'health' => '100',
             'exp' => '500000',
             'money' => '25600',
+            'gang_id' => '2'
         ]);
         
         DB::table('gangs')->insert([
@@ -53,10 +55,30 @@ class DatabaseSeeder extends Seeder
             'total_gang_exp' => '50000',
             'gang_boss_id' => '1',
         ]);
+        
+        DB::table('gangs')->insert([
+            'name' => 'Noob Gang',
+            'description' => 'De gang van de noobs',
+            'gang_money' => '10000',
+            'total_gang_exp' => '50000',
+            'gang_boss_id' => '2',
+        ]);
 
         DB::table('gang_approval')->insert([
             'user_id' => '1',
             'gang_id' => '1',
+            'status' => '1'
+        ]);
+
+        DB::table('gang_approval')->insert([
+            'user_id' => '3',
+            'gang_id' => '1',
+            'status' => '1'
+        ]);
+
+        DB::table('gang_approval')->insert([
+            'user_id' => '2',
+            'gang_id' => '2',
             'status' => '1'
         ]);
 

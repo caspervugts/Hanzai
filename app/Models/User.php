@@ -60,7 +60,7 @@ class User extends Authenticatable
         return $this->belongsToMany(Weapon::class, 'user_weapon')->withPivot('ammo_amount');
     }
 
-    public function gangs()
+    public function gang()
     {
         return $this->belongsTo(Gang::class);
     }
