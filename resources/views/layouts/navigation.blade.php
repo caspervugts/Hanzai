@@ -21,7 +21,13 @@
                     <x-nav-link :href="route('crime')" :active="request()->routeIs('crime')">
                         {{ __('Crime') }}
                     </x-nav-link>
-                </div>                
+                </div>        
+                
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('city')" :active="request()->routeIs('city')">
+                        {{ __('City') }}
+                    </x-nav-link>
+                </div>  
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('garage')" :active="request()->routeIs('garage')">

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CrimeController;
 use App\Http\Controllers\GamblingController;
+use App\Http\Controllers\CityController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\GangController;
 use Illuminate\Support\Facades\Route;
@@ -24,8 +25,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/jail')->name('jail');
     Route::get('/crime/result', [CrimeController::class, 'result'])->name('crimeResult');
 
+    Route::get('/city', [CityController::class, 'view'])->name('city');
+
     Route::get('/crime/1/{whichCrime}', [CrimeController::class, 'performRobbery'])->name('performRobbery');
     Route::get('/crime/2/{whichCrime}', [CrimeController::class, 'performCarTheft'])->name('performCarTheft');
+    Route::get('/crime/hit/{userId}', [CrimeController::class, 'scheduleHit'])->name('scheduleHit');
+    Route::get('/crime/hit/execute/{hitId}', [CrimeController::class, 'performHit'])->name('performHit');
 
     Route::get('/gang', [GangController::class, 'view'])->name('gang');    
     Route::post('/gang/create', [GangController::class, 'createGang'])->name('createGang');

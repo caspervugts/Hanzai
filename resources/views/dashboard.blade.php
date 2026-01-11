@@ -93,4 +93,25 @@
             <br>
         </div>
     </div>
+    <br/>
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-black-900">
+                    {{ __("Previous Hit Log") }}  
+                                                   
+                </div>  
+                <div class="p-6 text-gray-900">
+                    @foreach($previousHitsEvents as $hitId => $events)
+                        <div>
+                            <strong>Latest combat: </strong>
+                            <ul>
+                                @foreach($eventDescriptions[$hitId] as $event)
+                                    <li>{{ $event->move_user_name }} {{ $event->event_detail->event_description }} </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <br/>
+                    @endforeach
+                </div>
+            </div>
 </x-app-layout>

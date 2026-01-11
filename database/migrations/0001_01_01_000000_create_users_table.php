@@ -17,10 +17,13 @@ return new class extends Migration
             $table->string('email',55)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('city')->default('1');
             $table->foreignId('gang_id')->nullable();
             $table->integer('health')->default(100);
             $table->integer('exp')->default(0);
             $table->integer('gang_exp')->default(0);
+            //cooldown voor hits -> 1 is cooldown active, 0 is geen cooldown
+            $table->integer('cooldown')->default(0);
             $table->integer('money')->default(50);
             $table->rememberToken();
             $table->timestamps();

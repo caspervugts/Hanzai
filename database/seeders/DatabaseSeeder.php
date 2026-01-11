@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('starcraft'),
             'health' => '100',
             'exp' => '500000',
-            'money' => '15655500',
+            'money' => '25655501',
             'gang_exp' => '25000',
             'gang_id' => '1'
         ]);
@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('starcraft'),
             'health' => '100',
             'exp' => '50',
-            'money' => '100',
+            'money' => '50000',
         ]);
 
         DB::table('users')->insert([
@@ -60,6 +60,10 @@ class DatabaseSeeder extends Seeder
             'status' => '1'
         ]);
 
+         DB::table('cities')->insert([
+            'name' => 'Tokyo',
+            'description' => 'The capital of Japan, known for its bustling streets and vibrant culture.',
+        ]);
 
         DB::table('crimes_robbery')->insert([
             'name' => 'Rob a tourist',
@@ -180,6 +184,7 @@ class DatabaseSeeder extends Seeder
             Horses::class,
             Weapons::class,
             ChatMessages::class,
+            Races::class,
         ]);
     }
 }
