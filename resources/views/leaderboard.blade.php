@@ -22,20 +22,22 @@
                 <div class="p-6 text-gray-900">       
                 <table class="table-auto w-full">
                     <thead>
-                        <tr>
+                        <tr style="text-align:center;">
                             <th class="px-4 py-2">Rank</th>
                             <th class="px-4 py-2">Username</th>
                             <th class="px-4 py-2">Money</th>
                             <th class="px-4 py-2">Experience</th>
+                            <th class="px-4 py-2">Alive?</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($users as $index => $user)
-                        <tr>                            
+                        <tr style="text-align:center;">
                             <td class="border px-4 py-2">{{ $index + 1 }}</td>
                             <td class="border px-4 py-2">{{ $user->name }}</td>
                             <td class="border px-4 py-2">¥{{ number_format($user->money) }}</td>
                             <td class="border px-4 py-2">{{ $user->exp }}</td>
+                            <td class="border px-4 py-2" >{{ $user->alive = 1 ? '🩷' : '💀' }}</td>
                         </tr>
                         @endforeach
                     </tbody>

@@ -14,28 +14,33 @@ class Weapons extends Seeder
     public function run(): void
     {
         DB::table('weapons')->insert([
+            'name' => 'Knife',
+            'description' => 'A sharp blade for close combat.',
+            'damage' => '2500',            
+            'value' => '3500'
+        ]);
+
+        DB::table('weapons')->insert([
+            
             'name' => 'Glock-17',
-            'damage' => '5',
+            'description' => 'A compact semi-automatic pistol.',
+            'damage' => '3',
             'ammo' => '9mm',    
             'value' => '15000'
         ]);
 
         DB::table('weapons')->insert([
             'name' => 'Mini-Uzi',
+            'description' => 'A small, lightweight submachine gun.',
             'damage' => '10',
             'ammo' => '9mm',    
-            'value' => '35000'
-        ]);
-
-        DB::table('weapons')->insert([
-            'name' => 'Knife',
-            'damage' => '2',            
-            'value' => '3500'
-        ]);
+            'value' => '30000'
+        ]);        
 
         DB::table('weapons')->insert([
             'name' => 'Ak-47',
-            'damage' => '25',
+            'description' => 'A powerful assault rifle.',
+            'damage' => '20',
             'ammo' => '7.62mm',    
             'value' => '150000'
         ]);

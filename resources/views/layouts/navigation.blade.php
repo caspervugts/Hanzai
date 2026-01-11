@@ -34,12 +34,6 @@
                         {{ __('Garage') }}
                     </x-nav-link>
                 </div>  
-
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('shop')" :active="request()->routeIs('shop')">
-                        {{ __('Shop') }}
-                    </x-nav-link>
-                </div>
                 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('gambling')" :active="request()->routeIs('gambling')">
@@ -79,7 +73,12 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
-
+                        <x-dropdown-link :href="route('combatlog')">
+                            {{ __('Combat Log') }}
+                        </x-dropdown-link>
+                        <x-dropdown-link :href="route('help')">
+                            {{ __('Help / FAQ') }}
+                        </x-dropdown-link>
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -136,16 +135,13 @@
                         {{ __('Crime') }}
                     </x-responsive-nav-link>
                                
+                    <x-responsive-nav-link :href="route('city')" :active="request()->routeIs('city')">
+                            {{ __('City') }}    
+                    </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('garage')" :active="request()->routeIs('garage')">
                         {{ __('Garage') }}
                     </x-responsive-nav-link>
-                  
-
-                <x-responsive-nav-link :href="route('shop')" :active="request()->routeIs('shop')">
-                        {{ __('Shop') }}
-                    </x-responsive-nav-link>
-                
                 
                 <x-responsive-nav-link :href="route('gambling')" :active="request()->routeIs('gambling')">
                         {{ __('Gambling') }}

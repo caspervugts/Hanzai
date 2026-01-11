@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\User;
 use App\Models\Car;
+
 use DB;
 
 
@@ -44,11 +45,31 @@ class ShopController extends Controller
                 'weapon_id' => $weaponId,
                 'ammo_amount' => 100    
             ]);
-            
-            return Redirect::route('shop')->withInput(['value' => 'You bought the item.']);
+
+            return Redirect::route('city')->with(['success' => 'You bought the weapon.']);
         }
         else{
-            return Redirect::route('shop')->withErrors(['money' => 'You don\'t have enough money to purchase this item.']);
+            return Redirect::route('city')->withErrors(['money' => 'You don\'t have enough money to purchase this item.']);
         }
+    }
+
+    public function buyFood($foodId)
+    {
+        $user = User::find(Auth::user()->id);
+        $food = DB::table('foods')->where('id', $foodId)->first();
+
+        if($user->money < $food->value){
+            return Redirect::back()->withErrors(['You do not have enough money to buy this food item.']);
+        }
+
+        // Deduct money and restore health
+        $user->money -= $food->value;
+        $user->health += $food->health_restore;
+        if($user->health > 100){
+            $user->health = 100; // Cap health at 100
+        }
+        $user->save();
+
+        return Redirect::back()->with('success', 'You have successfully bought '.$food->name.' and restored '.$food->health_restore.' health!');
     }
 }

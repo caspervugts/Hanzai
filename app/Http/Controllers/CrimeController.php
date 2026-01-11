@@ -26,7 +26,11 @@ class CrimeController extends Controller
             $robbery = DB::table('crimes_robbery')->select('difficulty', 'description')->get();
             $cartheft = DB::table('crimes_cartheft')->select('difficulty', 'description')->get();
 
-            $allusers = DB::select("SELECT * FROM users WHERE health > 0 AND city = ".Auth::user()->city."");
+            if(Auth::user()->gang_id == null){
+                $allusers = DB::select("SELECT * FROM users WHERE health > 0 AND city = ".Auth::user()->city."");
+            }else{
+                $allusers = DB::select("SELECT * FROM users WHERE health > 0 AND city = ".Auth::user()->city." and gang_id != ".Auth::user()->gang_id." or gang_id is null");
+            }
             $currentCity = City::where('id', Auth::user()->city)->first();
 
             $previousHits = DB::table('pvp_battle_instance')
@@ -157,20 +161,18 @@ class CrimeController extends Controller
         $targetUser = User::where('id', $userId)->first();
 
         $scheduledAttack = DB::table('pvp_battle_instance')->where('completed', 0)->where('attacker_id', Auth::user()->id)->first();
-        if($scheduledAttack){
+        #dd($targetUser->cooldown);
+        if($scheduledAttack != null){
             #dd($scheduledAttack);
-            return redirect()->route('crime')->with('error', 'You already have a scheduled hit.');
+            return redirect()->route('crime')->withErrors(['error' => 'You already have a hit scheduled.']);
         }
 
-        if(!$targetUser){
-            return redirect()->route('crime')->with('error', 'User not found.');
-        }
         if($targetUser->cooldown == 1){
-            return redirect()->route('crime')->with('error', 'User is already targeted for a hit.');
+            return redirect()->route('crime')->withErrors(['error' => 'User is already targeted for a hit.']);
         }
 
         if(Auth::user()->cooldown == 1){
-            return redirect()->route('crime')->with('error', 'You are already feel something bad is going to happen soon..');
+            return redirect()->route('crime')->withErrors(['error' => 'You are already feel something bad is going to happen soon..']);
         }
 
         //update cooldown voor users
@@ -205,51 +207,6 @@ class CrimeController extends Controller
         $attackerWeapons = $attacker->weapons;
         $defenderWeapons = $defender->weapons;  
         #dd($attackerWeapons);
-        //  Je bent gespot door de spooky skelet 
-        //               _.---._
-        //              .'       `.
-        //              :)       (:
-        //              \ (@) (@) /
-        //               \   A   /
-        //                )     (
-        //                \"""""/
-        //                 `._.'
-        //                  .=.
-        //          .---._.-.=.-._.---.
-        //         / ':-(_.-: :-._)-:` \
-        //        / /' (__.-: :-.__) `\ \
-        //       / /  (___.-` '-.___)  \ \
-        //      / /   (___.-'^`-.___)   \ \
-        //     / /    (___.-'=`-.___)    \ \
-        //    / /     (____.'=`.____)     \ \
-        //   / /       (___.'=`.___)       \ \
-        //  (_.;       `---'.=.`---'       ;._)
-        //  ;||        __  _.=._  __        ||;
-        //  ;||       (  `.-.=.-.'  )       ||;
-        //  ;||       \    `.=.'    /       ||;
-        //  ;||        \    .=.    /        ||;
-        //  ;||       .-`.`-._.-'.'-.       ||;
-        // .:::\      ( ,): O O :(, )      /:::.
-        // |||| `     / /'`--'--'`\ \     ' ||||
-        // ''''      / /           \ \      ''''
-        //          / /             \ \
-        //         / /               \ \
-        //        / /                 \ \
-        //       / / Fix binnen 30 min \ \
-        //      / / 3 bugs of de spooky \ \
-        //     /.' skelet zal vanavond   `.\
-        //    (_)'   voor je bed staan   `(_)
-        //     \\.                       .//
-        //      \\.                     .//
-        //       \\.                   .//
-        //        \\.                 .//
-        //         \\.               .//
-        //          \\.             .//
-        //           \\.           .//
-        //           ///)         (\\\
-        //         ,///'           `\\\,
-        //        ///'               `\\\
-        //       ""'                   '""
 
         foreach($attackerWeapons as $weapon){
             $events = $weapon->events;
@@ -363,15 +320,17 @@ class CrimeController extends Controller
             if($selectedEvent->event_recipient == 2){ //target
                 DB::table('users')
                     ->where('id', $attacker->id)
-                    ->decrement('health', $selectedEvent->event_damage);
-                DB::table('users')->where('id', $attacker->id)->update(['cooldown' => 0]); //reset cooldown after being attacked (dit moet in de toekomst anders)
+                    ->decrement('health', $selectedEvent->event_damage);                
             }elseif($selectedEvent->event_recipient == 1){ //self
                 DB::table('users')
                     ->where('id', $defender->id)
-                    ->decrement('health', $selectedEvent->event_damage);
-                DB::table('users')->where('id', $defender->id)->update(['cooldown' => 0]); //reset cooldown (dit moet in the toekomst anders)
+                    ->decrement('health', $selectedEvent->event_damage);                
             }
         }
+
+        //reset cooldowns
+        DB::table('users')->where('id', $attacker->id)->update(['cooldown' => 0]); //reset cooldown after being attacked (dit moet in de toekomst anders)
+        DB::table('users')->where('id', $defender->id)->update(['cooldown' => 0]); //reset cooldown (dit moet in the toekomst anders)
 
         //update battle instance as completed
         DB::table('pvp_battle_instance')
