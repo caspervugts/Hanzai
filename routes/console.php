@@ -12,15 +12,27 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 Schedule::call(function () {
-    //$completed =  Carbon::now()->addSeconds(600);
-    $closeDate =  Carbon::now()->addSeconds(300);
-    for($i = 1; $i < 9; $i++){
-        DB::table('races')->insert([
-            'horse_id' => $i,
-            'closedate' => $closeDate           
-        ]);
-    }
-})->everyFiveMinutes();
+    $paard = app()->call('App\Http\Controllers\GamblingController@createRace');
+    
+})->hourlyAt(59);
+
+Schedule::call(function () {
+    $deathtimer = app()->call('App\Http\Controllers\ProfileController@emptyTimeOfDeath');
+    $combat = app()->call('App\Http\Controllers\CrimeController@performHit');
+})->everyTenSeconds();
+
+#->everyMinute();
+
+// Schedule::call(function () {
+//     //$completed =  Carbon::now()->addSeconds(600);
+//     $closeDate =  Carbon::now()->addSeconds(300);
+//     for($i = 1; $i < 9; $i++){
+//         DB::table('races')->insert([
+//             'horse_id' => $i,
+//             'closedate' => $closeDate           
+//         ]);
+//     }
+// })->everyFiveMinutes();
 
 //Schedule::job(new Heartbeat)->everyFiveMinutes();
-//Schedule::call(new createRace)->everyFiveMinutes();
+#Schedule::call()->everyMinute();

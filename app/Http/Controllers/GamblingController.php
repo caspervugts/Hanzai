@@ -22,16 +22,43 @@ class GamblingController extends Controller
         if(empty($results)){                      
             $race = Race::with('horses')->where('completed', '0')->first();
             $horses = $race->horses;  // Retrieves all horses associated with the race
+
+            // Compute payout multiplier (based on 1 / odds) and pick an image if available
+            foreach ($horses as $horse) {
+                $odds = floatval($horse->odds ?: 0);
+                if ($odds > 0) {
+                    // multiplier used in createRace when allocating payouts
+                    $horse->payoutMultiplier = round(1 / $odds, 2);
+                } else {
+                    $horse->payoutMultiplier = null;
+                }
+
+                // Try to find an image in public/images/horses by id (png/jpg/svg)
+                $imagePath = null;
+                foreach (['png', 'jpg', 'jpeg', 'svg'] as $ext) {
+                    if (file_exists(public_path("images/horses/{$horse->id}.{$ext}"))) {
+                        $imagePath = "images/horses/{$horse->id}.{$ext}";
+                        break;
+                    }
+                }
+
+                if (!$imagePath) {
+                    $imagePath = 'images/horses/placeholder.svg';
+                }
+
+                $horse->image = $imagePath;
+            }
+
             // removed debug dd so execution continues
             $bets = Bet::with('horses') 
                         ->where('user_id', Auth::id())
                         ->where('race_id', $race->id)
                         ->get();
             
-            $recentlyCompletedRaces = Race::where('completed', '1')->orderBy('id', 'desc')->take(5)->get();
+            $recentlyCompletedRaces = Race::where('completed', '1')->orderBy('id', 'desc')->take(50)->get();
             foreach($recentlyCompletedRaces as $completedRace){
-                $winners = Horse::find($completedRace->winner);
-                // You can now use $winnerHorse as needed
+                $winnerHorse = Horse::find($completedRace->winner);
+                $completedRace->winner_name = $winnerHorse ? $winnerHorse->name : null;
             }
             #dd($recentlyCompletedRaces);
             return view('gambling', ['user' => $request->user(), 'horses' => $horses, 'bets' => $bets, 'recentlyCompletedRaces' => $recentlyCompletedRaces]);

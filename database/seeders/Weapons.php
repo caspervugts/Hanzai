@@ -47,32 +47,36 @@ class Weapons extends Seeder
 
         //glock-17 events
         DB::table('pvp_item_events')->insert([
-            'item_id' => '1', // Glock-17
-            'event_description' => ' fired a shot from his/her Glock-17 and hit his/her target in the arm dealing 2 damage.',
+            'item_id' => '2', // Glock-17
+            'event_description_part_one' => 'fired a shot from his/her Glock-17 and hit',
+            'event_description_part_two' => 'in the arm dealing 2 damage.',
             'event_chance' => '70',
             'event_damage' => '2',
             'event_recipient' => '2'
         ]); 
 
         DB::table('pvp_item_events')->insert([
-            'item_id' => '1', // Glock-17
-            'event_description' => ' fired a shot from his/her Glock-17 and hit his/her target in the head dealing 25 damage.',
+            'item_id' => '2', // Glock-17
+            'event_description_part_one' => 'fired a shot from his/her Glock-17 and hit',
+            'event_description_part_two' => 'in the head dealing 25 damage.',
             'event_chance' => '10',
             'event_damage' => '25',
             'event_recipient' => '2' 
         ]); 
 
         DB::table('pvp_item_events')->insert([
-            'item_id' => '1', // Glock-17
-            'event_description' => ' fired a shot from his/her Glock-17 and missed his/her target completely.',
+            'item_id' => '2', // Glock-17
+            'event_description_part_one' => 'fired a shot from his/her Glock-17 and missed',
+            'event_description_part_two' => 'completely',
             'event_chance' => '50',
             'event_damage' => '0',
             'event_recipient' => '2' 
         ]); 
 
         DB::table('pvp_item_events')->insert([
-            'item_id' => '1', // Glock-17
-            'event_description' => ' fired a shot from his/her Glock-17 and shot himself/herself in the foot dealing 5 damage. Stupid ass.',
+            'item_id' => '2', // Glock-17
+            'event_description_part_one' => 'fired a shot from his/her Glock-17 and shot',
+            'event_description_part_two' => 'in the foot dealing 5 damage. Stupid ass.',
             'event_chance' => '15',
             'event_damage' => '5',
             'event_recipient' => '1' 
@@ -82,7 +86,8 @@ class Weapons extends Seeder
         //ak47 events
         DB::table('pvp_item_events')->insert([
             'item_id' => '4', // Ak-47
-            'event_description' => ' fired a shot from his/her Ak-47 and hit his/her target in the arm dealing 25 damage.',
+            'event_description_part_one' => 'fired a shot from his/her Ak-47 and hit',
+            'event_description_part_two' => 'in the arm dealing 25 damage.',
             'event_chance' => '70',
             'event_damage' => '25',
             'event_recipient' => '2'
@@ -90,7 +95,8 @@ class Weapons extends Seeder
 
         DB::table('pvp_item_events')->insert([
             'item_id' => '4', // Ak-47  
-            'event_description' => ' fired a shot from his/her Ak-47 and hit his/her target in the head dealing 85 damage.',
+            'event_description_part_one' => 'fired a shot from his/her Ak-47 and hit',
+            'event_description_part_two' => 'in the head dealing 85 damage.',
             'event_chance' => '10',
             'event_damage' => '85',
             'event_recipient' => '2' 
@@ -98,7 +104,8 @@ class Weapons extends Seeder
 
         DB::table('pvp_item_events')->insert([
             'item_id' => '4', // Ak-47
-            'event_description' => ' fired a shot from his/her Ak-47 and missed his/her target completely.',
+            'event_description_part_one' => 'fired a shot from his/her Ak-47 and missed',
+            'event_description_part_two' => 'completely.',
             'event_chance' => '50',
             'event_damage' => '0',
             'event_recipient' => '2' 
@@ -106,7 +113,8 @@ class Weapons extends Seeder
 
         DB::table('pvp_item_events')->insert([
             'item_id' => '4', // Ak-47
-            'event_description' => ' fired a shot from his/her Ak-47. The bullet ricocheted off the wall and hits himself/herself in the leg dealing 25 damage. Unlucky.',
+            'event_description_part_one' => 'fired a shot from his/her Ak-47. The bullet ricocheted off the wall and hits',
+            'event_description_part_two' => 'in the leg dealing 25 damage. Unlucky.',
             'event_chance' => '15',
             'event_damage' => '25',
             'event_recipient' => '1' 
@@ -114,32 +122,82 @@ class Weapons extends Seeder
 
         //Knife events
         DB::table('pvp_item_events')->insert([
-            'item_id' => '3', // Knife
-            'event_description' => ' stabbed his/her target in the arm dealing 2 damage.',
+            'item_id' => '1', // Knife
+            'event_description_part_one' => 'stabbed',
+            'event_description_part_two' => 'in the arm dealing 2 damage.',
             'event_chance' => '70',
             'event_damage' => '2',
             'event_recipient' => '2'
         ]); 
 
         DB::table('pvp_item_events')->insert([
-            'item_id' => '3', // Knife
-            'event_description' => ' stabbed his/her target in the head dealing 10 damage.',
+            'item_id' => '1', // Knife
+            'event_description_part_one' => 'stabbed',
+            'event_description_part_two' => 'in the head dealing 10 damage.',
             'event_chance' => '10',
             'event_damage' => '10',
             'event_recipient' => '2' 
         ]); 
 
         DB::table('pvp_item_events')->insert([
-            'item_id' => '3', // Knife
-            'event_description' => ' hurt himself/herself trying to stab his/her target.',
+            'item_id' => '1', // Knife
+            'event_description_part_one' => 'hurt himself/herself trying to stab',
+            'event_description_part_two' => 'in the arm dealing 2 damage to him/herself.',
             'event_chance' => '20',
             'event_damage' => '2',
             'event_recipient' => '1'
         ]); 
 
         DB::table('pvp_item_events')->insert([
-            'item_id' => '3', // Knife
-            'event_description' => ' stabbed his/her target in the leg dealing 4 damage.',
+            'item_id' => '1', // Knife
+            'event_description_part_one' => 'stabbed',
+            'event_description_part_two' => 'in the leg dealing 4 damage.',
+            'event_chance' => '70',
+            'event_damage' => '4',
+            'event_recipient' => '2'
+        ]); 
+
+        //Mini uzi events
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '3', // Uzi
+            'event_description_part_one' => 'fired a shot from his/her Uzi and hit',
+            'event_description_part_two' => 'in the arm dealing 10 damage.',
+            'event_chance' => '70',
+            'event_damage' => '10',
+            'event_recipient' => '2'
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '3', // Uzi
+            'event_description_part_one' => 'fired a shot from his/her Uzi and hit',
+            'event_description_part_two' => 'in the head dealing 45 damage.',
+            'event_chance' => '10',
+            'event_damage' => '45',
+            'event_recipient' => '2' 
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '3', // Uzi
+            'event_description_part_one' => 'fired a shot from his/her Uzi and missed',
+            'event_description_part_two' => 'completely.',
+            'event_chance' => '20',
+            'event_damage' => '0',
+            'event_recipient' => '2'
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '3', // Uzi
+            'event_description_part_one' => 'fired a shot from his/her Uzi. The bullet ricocheted off the wall and doesn\'t hit',
+            'event_description_part_two' => ' but instead himself/herself in the leg dealing 10 damage. Unlucky.',
+            'event_chance' => '15',
+            'event_damage' => '10',
+            'event_recipient' => '1'
+        ]); 
+
+        DB::table('pvp_item_events')->insert([
+            'item_id' => '3', // Uzi
+            'event_description_part_one' => 'fired a shot from his/her Uzi and hit',
+            'event_description_part_two' => 'in the leg dealing 4 damage.',
             'event_chance' => '70',
             'event_damage' => '4',
             'event_recipient' => '2'

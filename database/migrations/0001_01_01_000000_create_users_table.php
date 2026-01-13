@@ -26,6 +26,7 @@ return new class extends Migration
             //cooldown voor hits -> 1 is cooldown active, 0 is geen cooldown
             $table->integer('cooldown')->default(0);            
             $table->integer('money')->default(50);
+            $table->timestamp('time_of_death')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

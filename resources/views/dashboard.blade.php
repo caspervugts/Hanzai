@@ -1,51 +1,5 @@
 <x-app-layout>
-    <style>
-        path:hover { 
-            fill: #fce57e;
-        }
 
-        /* Dropdown Button */
-        .dropbtn {
-        background-color: #04AA6D;
-        color: white;
-        padding: 16px;
-        font-size: 16px;
-        border: none;
-        }
-
-        /* The container <div> - needed to position the dropdown content */
-        .dropdown {
-        position: relative;
-        display: inline-block;
-        }
-
-        /* Dropdown Content (Hidden by Default) */
-        .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #f1f1f1;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-        }
-
-        /* Links inside the dropdown */
-        .dropdown-content a {
-        color: black;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-        }
-
-        /* Change color of dropdown links on hover */
-        .dropdown-content a:hover {background-color: #ddd;}
-
-        /* Show the dropdown menu on hover */
-        .dropdown:hover .dropdown-content {display: block;}
-
-        /* Change the background color of the dropdown button when the dropdown content is shown */
-        .dropdown:hover .dropbtn {background-color: #3e8e41;}
-    </style>
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -53,65 +7,75 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("Welcome back") }} {{ $user->name }} <br/>
-                    {{ __("Health") }} {{ $user->health }} <br/>
-                    {{ __("Experience") }} {{ $user->exp }} <br/>
-                    {{ __("Money") }} ¥{{ number_format($user->money) }} <br/>
-                    @if ($user->exp >= 0 and $user->exp < 99)
-                        Rank: <b>Nobody</b>
-                    @elseif ($user->exp < 250)
-                        Rank: <b>Bosozoku</b>           
-                    @elseif ($user->exp < 500)
-                        Rank: <b>Shatei</b> 
-                    @elseif ($user->exp < 1000)
-                        Rank: <b>Kyodai</b> 
-                    @elseif ($user->exp < 2000)
-                        Rank: <b>Shateeigashira</b> 
-                    @elseif ($user->exp < 5000)
-                        Rank: <b>Wakagashira</b> 
-                    @elseif ($user->exp > 5000)
-                        Rank: <b>Oyabun</b> 
-                    @endif
-                    
-                </div>                
-            </div>
-        </div>
-        <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <b>{{ __("Inventory") }}  </b><br/>
-                    @foreach ($weapons as $weapon)
-                        <p>{{ $weapon->name }}  </p>
-                    @endforeach      
-                </div>                
-            </div>
-            <br>
-        </div>
-    </div>
-    <br/>
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-black-900">
-                    {{ __("Previous Hit Log") }}  
-                                                   
-                </div>  
-                <div class="p-6 text-gray-900">
-                    @foreach($previousHitsEvents as $hitId => $events)
-                        <div>
-                            <strong>Latest combat: </strong>
-                            <ul>
-                                @foreach($eventDescriptions[$hitId] as $event)
-                                    <li>{{ $event->move_user_name }} {{ $event->event_detail->event_description }} </li>
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            @if (session('message'))
+                <div class="bg-green-50 border border-green-200 text-green-800 rounded-md p-4">
+                    {{ session('message') }}
+                </div>
+            @endif
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                <!-- User Summary -->
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-bold">{{ __('Welcome back') }}, {{ $user->name }}</h3>
+                    <div class="mt-3 text-sm text-gray-600 space-y-2">
+                        <div>{{ __('Health') }}: <span class="font-medium">{{ $user->health }}</span></div>
+                        <div>{{ __('Experience') }}: <span class="font-medium">{{ $user->exp }}</span></div>
+                        <div>{{ __('Money') }}: <span class="font-medium">¥{{ number_format($user->money) }}</span></div>
+                        @php
+                            $exp = $user->exp ?? 0;
+                            if ($exp < 100) { $rank = 'Nobody'; }
+                            elseif ($exp < 250) { $rank = 'Bosozoku'; }
+                            elseif ($exp < 500) { $rank = 'Shatei'; }
+                            elseif ($exp < 1000) { $rank = 'Kyodai'; }
+                            elseif ($exp < 2000) { $rank = 'Shateeigashira'; }
+                            elseif ($exp < 5000) { $rank = 'Wakagashira'; }
+                            else { $rank = 'Oyabun'; }
+                        @endphp
+                        
+                        <div>{{ __('Rank') }}: <span class="inline-block bg-indigo-100 text-indigo-800 px-2 py-1 rounded"><b>{{ $rank }}</b></span></div>
+                    </div>
+                </div>
+
+                <!-- Inventory -->
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-bold">{{ __('Inventory') }}</h3>
+                    <div class="mt-3 text-sm text-gray-600">
+                        @if($weapons->isEmpty())
+                            <div class="text-sm text-gray-500">{{ __('You have no weapons.') }}</div>
+                        @else
+                            <ul class="list-disc list-inside">
+                                @foreach ($weapons as $weapon)
+                                    <li>{{ $weapon->name }}</li>
                                 @endforeach
                             </ul>
-                        </div>
-                        <br/>
-                    @endforeach
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Previous Hit Log -->
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-bold">{{ __('Previous Hit Log') }}</h3>
+                    <div class="mt-3 text-sm text-gray-700 space-y-3">
+                        @forelse($previousHitsEvents as $hitId => $events)
+                                              
+                            <div>
+                                <div class="font-medium">{{ __('Latest combat') }}</div>
+                                <ul class="list-disc list-inside ml-4">
+                                    @foreach($eventDescriptions[$hitId] ?? [] as $event)                                   
+                                        <li><b>{{ $event->move_user_name }}</B> {{ $event->event_detail->event_description_part_one }} <b>{{ $event->move_recipient_name }}</b> {{ $event->event_detail->event_description_part_two }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @empty
+                            <div class="text-sm text-gray-500">{{ __('No recent combat logs.') }}</div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
+
+        </div>
+    </div>
 </x-app-layout>

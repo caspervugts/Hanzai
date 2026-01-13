@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('pvp_battle_moves', function (Blueprint $table) {
             $table->id()->primary();
             $table->foreignId('battle_instance_id'); //instance_id
-            $table->foreignId('move_user_id'); //useer_id
+            $table->foreignId('move_user_id'); //user_id
+            $table->foreignId('move_recipient_id'); //user_id
             $table->integer('move_event_id'); //item_event_id
             $table->timestamps();
         });
