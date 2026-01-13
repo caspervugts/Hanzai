@@ -9,14 +9,17 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                     @if ($errors->any())
+                        <div class="bg-red-50 border border-red-200 text-red-800 rounded-md p-4">
+                            <ul class="list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     {{ __("You are currently in jail.") }}  
-                    <br>
-                    <!-- AJAX-knop om tabel te legen -->
-                    <button id="truncate-crimes" 
-                        class="mt-4 bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600">
-                        Delete all crimes
-                    </button>
-
+                    <br>             
                     <!-- Feedback -->
                     <div id="truncate-feedback" class="mt-2 text-green-600 hidden"></div>
                 </div>                

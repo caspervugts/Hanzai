@@ -90,10 +90,12 @@ class CrimeController extends Controller
             DB::table('users')
             ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
 
-            return view('crimeResult', [
-                'cash' => $reward,
-                'rewardSentence' => $rewardSentence,
-            ]);
+            return redirect()->route('crime')->with('success', $rewardSentence);
+
+            // return view('crimeResult', [
+            //     'cash' => $reward,
+            //     'rewardSentence' => $rewardSentence,
+            // ]);
         }else{
             $releaseDate =  Carbon::now()->addSeconds($crime[0]->cooldown);
             DB::table('crimes_performed')->insert([
@@ -107,6 +109,9 @@ class CrimeController extends Controller
             DB::table('users')
             ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
            
+            #return Redirect::route('crime')->withInput(['value' => 'You placed a bet. Good luck!']);
+            #return view('jail')->withErrors(['theft' => $crime[0]->failure]);
+            
             return view('crimeResult', [
                 'cash' => $reward,
                 'rewardSentence' => $crime[0]->failure,
@@ -117,9 +122,7 @@ class CrimeController extends Controller
     public function performCarTheft($whichCrime, Request $request){
         $crime = DB::table('crimes_cartheft')->select('difficulty','cooldown','exp','failure','success')->where('id', '=', $whichCrime)->get();
         $roll = rand(1, 100);
-        #dd($whichCrime);
-        $roll = 1;
-        #dd($roll < $crime[0]->difficulty);
+
         if ($roll < $crime[0]->difficulty){
             $reward = DB::table('cars')->select('id','description','min_money','max_money')->where('difficulty', '=', $whichCrime)->inRandomOrder()->limit(1)->get();  
             #dd($reward);
@@ -134,10 +137,12 @@ class CrimeController extends Controller
             DB::table('users')
             ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
             
-            return view('crimeResult', [
-                'cash' => $carValue,
-                'rewardSentence' => $rewardSentence,
-            ]);
+            return redirect()->route('crime')->with('success', $rewardSentence);
+
+            // return view('crimeResult', [
+            //     'cash' => $carValue,
+            //     'rewardSentence' => $rewardSentence,
+            // ]);
 
         }else{
             $releaseDate =  Carbon::now()->addSeconds($crime[0]->cooldown);
