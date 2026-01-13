@@ -40,7 +40,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckIfAlive::class])->group(fun
     Route::get('/crime/1/{whichCrime}', [CrimeController::class, 'performRobbery'])->name('performRobbery');
     Route::get('/crime/2/{whichCrime}', [CrimeController::class, 'performCarTheft'])->name('performCarTheft');
     Route::get('/crime/hit/{userId}', [CrimeController::class, 'scheduleHit'])->name('scheduleHit');
-    Route::get('/crime/hit/execute/{hitId}', [CrimeController::class, 'performHit'])->name('performHit');
+    Route::get('/crime/combat/executeAllHits', [CrimeController::class, 'performHit'])->name('performHit');
 
     Route::get('/gang', [GangController::class, 'view'])->name('gang');    
     Route::post('/gang/create', [GangController::class, 'createGang'])->name('createGang');
@@ -65,6 +65,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckIfAlive::class])->group(fun
     Route::get('/combatlog', [ProfileController::class, 'combatlog'])->name('combatlog');
     Route::get('/help', [ProfileController::class, 'help'])->name('help');
     Route::get('/death', [ProfileController::class, 'death'])->name('death');
+    Route::get('/emptyTimeOfDeath', [ProfileController::class, 'emptyTimeOfDeath'])->name('emptyTimeOfDeath');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');    
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

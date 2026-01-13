@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-1200 leading-tight text-center" style="color:red;font-size:34px;">
-            {{ __('You have died.') }}
+            {{ __('You have been hospitalized.') }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,21 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <p>Unfortunately, your character has died. Don't worry, death is a part of the game! You can create a new character and start your criminal journey anew. Remember to play smart and strategize to avoid untimely demises in the future. Good luck out there!</p>
+                    <p>Unfortunately, your character has been hospitalized. You are unable to perform any actions for the time being. You have lost all your money, inventory and half of your experience.</p>
+</br>
+                    <p>You'll be able to continue playing after 24 hours.</p>
+
+                    <p> <br/> Time of death: {{ $user->time_of_death }} </p>
+                    @if(!empty($combats) && count($combats) > 0)
+                        @php
+                            $lastCombat = (is_callable([$combats, 'first'])) ? $combats->first() : $combats[0];
+                            $lastEvents = $eventDescriptions[$lastCombat->id] ?? [];
+                            $lastEvent = !empty($lastEvents) ? end($lastEvents) : null;
+                        @endphp
+                        @if($lastEvent)
+                            <p><strong>Last combatant:</strong> {{ $lastEvent->move_user_name }}</p>
+                        @endif
+                    @endif
                 </div>
             </div>
     </div>
@@ -25,16 +39,13 @@
                                 <div class="p-6 text-gray-900">
                                     <strong>Combat log: </strong>
                                 @foreach($HitsEvents as $hitId => $events)
-                                    
-                                        
+                                    @if($combat->id === $hitId)
                                         <ul>
-                                            @foreach($eventDescriptions[$hitId] as $event)
-                                                @if($combat->id === $hitId)
-                                                    <li>{{ $event->move_user_name }} {{ $event->event_detail->event_description }} </li>
-                                                @endif
+                                            @foreach($eventDescriptions[$hitId] ?? [] as $event)
+                                                <li>{{ $event->move_user_name }} {{ $event->event_detail->event_description }} </li>
                                             @endforeach
                                         </ul>
-                                    
+                                    @endif
                                 @endforeach
                             </div>
                             </div>

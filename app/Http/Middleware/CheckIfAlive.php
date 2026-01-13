@@ -22,6 +22,14 @@ class CheckIfAlive
         if (! $user) {
             return $next($request);
         }
+        if ((int)$user->health <= 0) {
+            if( (int)$user->alive !== 0 ){
+                $user->time_of_death = now();
+            }
+            $user->alive = 0;            
+            $user->save();
+        }
+
         #dd((int)$user->alive);
         if ((int)$user->alive === 0) {
 

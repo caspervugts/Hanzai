@@ -55,7 +55,7 @@ class GamblingController extends Controller
                         ->where('race_id', $race->id)
                         ->get();
             
-            $recentlyCompletedRaces = Race::where('completed', '1')->orderBy('id', 'desc')->take(5)->get();
+            $recentlyCompletedRaces = Race::where('completed', '1')->orderBy('id', 'desc')->take(50)->get();
             foreach($recentlyCompletedRaces as $completedRace){
                 $winnerHorse = Horse::find($completedRace->winner);
                 $completedRace->winner_name = $winnerHorse ? $winnerHorse->name : null;

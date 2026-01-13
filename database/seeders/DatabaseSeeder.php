@@ -174,33 +174,6 @@ class DatabaseSeeder extends Seeder
             'success' => 'Holy shit, you stole a supercar. Congratulations. You stole a ',
             'cooldown' => '300'
         ]);
-        
-        DB::table('cars')->insert([
-            'name' => 'Peugeot 206',
-            'description' => 'Peugeot 206',
-            'difficulty' => '50',
-            'min_money' => '500',
-            'max_money' => '2000',
-            'performance' => '10'
-        ]);
-
-        DB::table('cars')->insert([
-            'name' => 'Fiat Punto',
-            'description' => 'Fiat Punto',
-            'difficulty' => '50',
-            'min_money' => '500',
-            'max_money' => '1500',
-            'performance' => '10'
-        ]);
-
-        DB::table('cars')->insert([
-            'name' => 'Volkswagen Up',
-            'description' => 'Volkswagen Up',
-            'difficulty' => '50',
-            'min_money' => '200',
-            'max_money' => '1000',
-            'performance' => '10'
-        ]);
 
         DB::table('foods')->insert([
             'name' => 'Onigiri',
@@ -235,6 +208,7 @@ class DatabaseSeeder extends Seeder
             Weapons::class,
             ChatMessages::class,
             Races::class,
+            Cars::class,
         ]);
     }
 }

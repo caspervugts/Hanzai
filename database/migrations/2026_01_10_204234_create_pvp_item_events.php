@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('pvp_item_events', function (Blueprint $table) {
             $table->id()->primary();
             $table->foreignId('item_id');
-            $table->string('event_description', 255);
+            $table->string('event_description_part_one', 255);
+            $table->string('event_description_part_two', 255);
             $table->integer('event_chance');
             $table->integer('event_damage');
             $table->integer('event_recipient'); //(1 enemy, 2 user)

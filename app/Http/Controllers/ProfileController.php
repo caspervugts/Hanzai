@@ -58,12 +58,15 @@ class ProfileController extends Controller
                     'event_detail' => $eventDetail,
                     'move_user_id' => $event->move_user_id,
                     'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
+                    'move_recipient_name' => User::where('id', $event->move_recipient_id)->first()->name,
                 ];
             }
-        }
-
+        }        
+        #$aliveTime = $request->user()->time_of_death->addHours(24);
+        $aliveTime = $request->user()->time_of_death->addMinutes(2);
+        
         return view('death', [
-            'user' => $request->user(), 'combats' => $combatLogs, 'HitsEvents' => $HitsEvents, 'eventDescriptions' => $eventDescriptions
+            'user' => $request->user(), 'combats' => $combatLogs, 'HitsEvents' => $HitsEvents, 'eventDescriptions' => $eventDescriptions, 'aliveTime' => $aliveTime
         ]);
     }
 
@@ -100,10 +103,11 @@ class ProfileController extends Controller
                     'event_detail' => $eventDetail,
                     'move_user_id' => $event->move_user_id,
                     'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
+                    'move_recipient_name' => User::where('id', $event->move_recipient_id)->first()->name,
                 ];
             }
         }
-
+        
         return view('dashboard', [
             'user' => $request->user(), 'weapons' => $weapons, 'previousHits' => $previousHits, 'previousHitsEvents' => $previousHitsEvents, 'eventDescriptions' => $eventDescriptions
         ]);
@@ -116,6 +120,14 @@ class ProfileController extends Controller
         return view('leaderboard', [
             'users' => $users,
         ]);
+    }
+
+    public function emptyTimeOfDeath(){
+        DB::table('users')
+            ->where('time_of_death', '<=', now())
+            ->update(['time_of_death' => null
+            ,'alive' => 1
+            ,'health' => 100]);
     }
 
     public function viewGarage(Request $request): View
@@ -200,7 +212,6 @@ class ProfileController extends Controller
             ->get();
             $HitsEvents[$hit->id] = $events;
         }
-        #dd($previousHits);
         
         $eventDescriptions = [];
         foreach($HitsEvents as $hitId => $events){

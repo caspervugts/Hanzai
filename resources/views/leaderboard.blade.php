@@ -37,7 +37,11 @@
                             <td class="border px-4 py-2">{{ $user->name }}</td>
                             <td class="border px-4 py-2">¥{{ number_format($user->money) }}</td>
                             <td class="border px-4 py-2">{{ $user->exp }}</td>
-                            <td class="border px-4 py-2" >{{ $user->alive = 1 ? '🩷' : '💀' }}</td>
+                            @if($user->alive)
+                            <td class="border px-4 py-2" >{{ $user->alive ? '🩷' : '💀' }}</td>
+                            @else
+                            <td class="border px-4 py-2" style="color:red;">{{ $user->alive ? '🩷' : '💀' }}</td>
+                            @endif
                         </tr>
                         @endforeach
                     </tbody>

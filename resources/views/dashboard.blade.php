@@ -60,11 +60,12 @@
                     <h3 class="text-lg font-bold">{{ __('Previous Hit Log') }}</h3>
                     <div class="mt-3 text-sm text-gray-700 space-y-3">
                         @forelse($previousHitsEvents as $hitId => $events)
+                                              
                             <div>
-                                <div class="font-medium">{{ __('Latest combat') }} — {{ $hitId }}</div>
+                                <div class="font-medium">{{ __('Latest combat') }}</div>
                                 <ul class="list-disc list-inside ml-4">
-                                    @foreach($eventDescriptions[$hitId] ?? [] as $event)
-                                        <li>{{ $event->move_user_name }} {{ $event->event_detail->event_description }}</li>
+                                    @foreach($eventDescriptions[$hitId] ?? [] as $event)                                   
+                                        <li><b>{{ $event->move_user_name }}</B> {{ $event->event_detail->event_description_part_one }} <b>{{ $event->move_recipient_name }}</b> {{ $event->event_detail->event_description_part_two }}</li>
                                     @endforeach
                                 </ul>
                             </div>
