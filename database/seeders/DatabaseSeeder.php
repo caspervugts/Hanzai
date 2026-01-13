@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('starcraft'),
             'health' => '100',
             'exp' => '500000',
-            'money' => '15655500',
+            'money' => '25655501',
             'gang_exp' => '25000',
             'gang_id' => '1'
         ]);
@@ -34,7 +34,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('starcraft'),
             'health' => '100',
             'exp' => '50',
-            'money' => '100',
+            'money' => '50000',
+            'gang_id' => '2'
         ]);
 
         DB::table('users')->insert([
@@ -43,7 +44,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('welkom01'),
             'health' => '100',
             'exp' => '500000',
-            'money' => '25655500',
+            'money' => '25600',
+            'gang_id' => '2'
         ]);
         
         DB::table('gangs')->insert([
@@ -53,6 +55,14 @@ class DatabaseSeeder extends Seeder
             'total_gang_exp' => '50000',
             'gang_boss_id' => '1',
         ]);
+        
+        DB::table('gangs')->insert([
+            'name' => 'Noob Gang',
+            'description' => 'De gang van de noobs',
+            'gang_money' => '10000',
+            'total_gang_exp' => '50000',
+            'gang_boss_id' => '2',
+        ]);
 
         DB::table('gang_approval')->insert([
             'user_id' => '1',
@@ -60,6 +70,22 @@ class DatabaseSeeder extends Seeder
             'status' => '1'
         ]);
 
+        DB::table('gang_approval')->insert([
+            'user_id' => '3',
+            'gang_id' => '1',
+            'status' => '1'
+        ]);
+
+        DB::table('gang_approval')->insert([
+            'user_id' => '2',
+            'gang_id' => '2',
+            'status' => '1'
+        ]);
+
+         DB::table('cities')->insert([
+            'name' => 'Tokyo',
+            'description' => 'The capital of Japan, known for its bustling streets and vibrant culture.',
+        ]);
 
         DB::table('crimes_robbery')->insert([
             'name' => 'Rob a tourist',
@@ -148,38 +174,41 @@ class DatabaseSeeder extends Seeder
             'success' => 'Holy shit, you stole a supercar. Congratulations. You stole a ',
             'cooldown' => '300'
         ]);
-        
-        DB::table('cars')->insert([
-            'name' => 'Peugeot 206',
-            'description' => 'Peugeot 206',
-            'difficulty' => '50',
-            'min_money' => '500',
-            'max_money' => '2000',
-            'performance' => '10'
+
+        DB::table('foods')->insert([
+            'name' => 'Onigiri',
+            'description' => 'A traditional Japanese rice ball, often wrapped in seaweed and filled with savory ingredients.',
+            'health_restore' => '2',
+            'value' => '1000'
         ]);
 
-        DB::table('cars')->insert([
-            'name' => 'Fiat Punto',
-            'description' => 'Fiat Punto',
-            'difficulty' => '50',
-            'min_money' => '500',
-            'max_money' => '1500',
-            'performance' => '10'
+        DB::table('foods')->insert([
+            'name' => 'Instant Noodles',
+            'description' => 'A quick and easy meal option, often flavored with various seasonings and toppings.',
+            'health_restore' => '5',
+            'value' => '2000'
         ]);
 
-        DB::table('cars')->insert([
-            'name' => 'Volkswagen Up',
-            'description' => 'Volkswagen Up',
-            'difficulty' => '50',
-            'min_money' => '200',
-            'max_money' => '1000',
-            'performance' => '10'
+        DB::table('foods')->insert([
+            'name' => 'Packed French Toast',
+            'description' => 'A delicious breakfast item made by soaking bread in a mixture of eggs and milk.',
+            'health_restore' => '14',
+            'value' => '5000'
+        ]);
+
+        DB::table('foods')->insert([
+            'name' => 'Japanese Bento Box',
+            'description' => 'A balanced meal typically consisting of rice, fish or meat, and pickled or cooked vegetables, all neatly packed in a box.',
+            'health_restore' => '30',
+            'value' => '10000'
         ]);
 
         $this->call([
             Horses::class,
             Weapons::class,
             ChatMessages::class,
+            Races::class,
+            Cars::class,
         ]);
     }
 }

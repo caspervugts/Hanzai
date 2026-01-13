@@ -10,7 +10,7 @@ class ChatMessage extends Model
     public $timestamps = false;
     use HasFactory;
     
-    protected $fillable = ['user_id', 'message'];
+    protected $fillable = ['user_id', 'chat_type', 'gang_id', 'message'];
 
     public function user()
     {

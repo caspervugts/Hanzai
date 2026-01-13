@@ -21,19 +21,19 @@
                     <x-nav-link :href="route('crime')" :active="request()->routeIs('crime')">
                         {{ __('Crime') }}
                     </x-nav-link>
-                </div>                
+                </div>        
+                
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('city')" :active="request()->routeIs('city')">
+                        {{ __('City') }}
+                    </x-nav-link>
+                </div>  
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('garage')" :active="request()->routeIs('garage')">
                         {{ __('Garage') }}
                     </x-nav-link>
                 </div>  
-
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('shop')" :active="request()->routeIs('shop')">
-                        {{ __('Shop') }}
-                    </x-nav-link>
-                </div>
                 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('gambling')" :active="request()->routeIs('gambling')">
@@ -46,6 +46,12 @@
                         {{ __('Gangs') }}
                     </x-nav-link>
                 </div>  
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">
+                        {{ __('Leaderboards') }}
+                    </x-nav-link>
+                </div>
             </div>
 
             <!-- Settings Dropdown -->
@@ -67,7 +73,12 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
-
+                        <x-dropdown-link :href="route('combatlog')">
+                            {{ __('Combat Log') }}
+                        </x-dropdown-link>
+                        <x-dropdown-link :href="route('help')">
+                            {{ __('Help / FAQ') }}
+                        </x-dropdown-link>
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -114,6 +125,36 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
+                <!-- Navigation Links -->
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-responsive-nav-link>
+                
+
+                <x-responsive-nav-link :href="route('crime')" :active="request()->routeIs('crime')">
+                        {{ __('Crime') }}
+                    </x-responsive-nav-link>
+                               
+                    <x-responsive-nav-link :href="route('city')" :active="request()->routeIs('city')">
+                            {{ __('City') }}    
+                    </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('garage')" :active="request()->routeIs('garage')">
+                        {{ __('Garage') }}
+                    </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('gambling')" :active="request()->routeIs('gambling')">
+                        {{ __('Gambling') }}
+                    </x-responsive-nav-link>
+                 
+
+                <x-responsive-nav-link :href="route('gang')" :active="request()->routeIs('gang')">
+                        {{ __('Gangs') }}
+                    </x-responsive-nav-link>
+             
+                <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">
+                        {{ __('Leaderboards') }}
+                    </x-responsive-nav-link>
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

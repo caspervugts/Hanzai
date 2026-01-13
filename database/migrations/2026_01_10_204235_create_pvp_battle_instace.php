@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chat_messages', function (Blueprint $table) {
+        Schema::create('pvp_battle_instance', function (Blueprint $table) {
             $table->id()->primary();
-            $table->foreignId('user_id');
-            $table->string('chat_type'); // all, gang,
-            $table->integer('gang_id')->nullable();
-            $table->string('message');
-            $table->timestamp('created_at')->useCurrent();
+            $table->foreignId('attacker_id'); //user id
+            $table->foreignId('defender_id'); //user id
+            $table->datetime('battle_starttime');
+            $table->integer('completed')->default(0);
+            $table->timestamps();
         });
     }
 
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('chat_messages');
+        Schema::dropIfExists('pvp_battle_instance');
     }
 };
