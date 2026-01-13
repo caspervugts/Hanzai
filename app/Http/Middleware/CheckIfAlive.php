@@ -62,6 +62,7 @@ class CheckIfAlive
                         'event_detail' => $eventDetail,
                         'move_user_id' => $event->move_user_id,
                         'move_user_name' => $moveUser ? $moveUser->name : null,
+                        'move_recipient_name' => User::find($event->move_recipient_id)?->name,
                     ];
                 }
             }

@@ -42,7 +42,7 @@
                                     @if($combat->id === $hitId)
                                         <ul>
                                             @foreach($eventDescriptions[$hitId] ?? [] as $event)
-                                                <li>{{ $event->move_user_name }} {{ $event->event_detail->event_description }} </li>
+                                                <li><b>{{ $event->move_user_name }}</B> {{ $event->event_detail->event_description_part_one }} <b>{{ $event->move_recipient_name }}</b> {{ $event->event_detail->event_description_part_two }}</li>
                                             @endforeach
                                         </ul>
                                     @endif

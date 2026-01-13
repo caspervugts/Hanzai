@@ -105,18 +105,21 @@
                     @if(empty($previousHitsEvents))
                         <div class="text-sm text-gray-500">{{ __('No past hit logs.') }}</div>
                     @else
-                        <div class="space-y-3 text-sm text-gray-700">
-                            @foreach($previousHitsEvents as $hitId => $events)
-                                <div>
-                                    <div class="font-medium">{{ __('Hit #') }} {{ $hitId }}</div>
-                                    <ul class="list-disc list-inside">
-                                        @foreach($eventDescriptions[$hitId] ?? [] as $event)
-                                            <li>{{ $event->move_user_name }} {{ $event->event_detail->event_description }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endforeach
-                        </div>
+                        <div class="mt-3 text-sm text-gray-700 space-y-3">
+                        @forelse($previousHitsEvents as $hitId => $events)
+                                              
+                            <div>
+                                <div class="font-medium">{{ __('Latest combat') }}</div>
+                                <ul class="list-disc list-inside ml-4">
+                                    @foreach($eventDescriptions[$hitId] ?? [] as $event)                                   
+                                        <li><b>{{ $event->move_user_name }}</B> {{ $event->event_detail->event_description_part_one }} <b>{{ $event->move_recipient_name }}</b> {{ $event->event_detail->event_description_part_two }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @empty
+                            <div class="text-sm text-gray-500">{{ __('No recent combat logs.') }}</div>
+                        @endforelse
+                    </div>
                     @endif
                 </div>
             </div>

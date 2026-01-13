@@ -57,6 +57,7 @@ class CrimeController extends Controller
                         'event_detail' => $eventDetail,
                         'move_user_id' => $event->move_user_id,
                         'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
+                        'move_recipient_name' => User::where('id', $event->move_recipient_id)->first()->name,
                     ];
                 }
             }

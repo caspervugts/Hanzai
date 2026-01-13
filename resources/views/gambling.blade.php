@@ -18,7 +18,7 @@
             <div class="bg-white shadow-sm sm:rounded-lg p-6 flex items-center justify-between">
                 <div>
                     <h3 class="text-lg font-bold">{{ __('Horse Racing') }}</h3>
-                    <p class="text-sm text-gray-600">{{ __('Place your bets and try your luck!') }}</p>
+                    <p class="text-sm text-gray-600">{{ __('Every hour there is a new race. Place your bets and try your luck!') }}</p>
                 </div>
                 <div class="text-right">
                     <div class="text-sm text-gray-500">{{ __('Your current money') }}</div>
