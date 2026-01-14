@@ -25,7 +25,8 @@ class DatabaseSeeder extends Seeder
             'exp' => '500000',
             'money' => '25655501',
             'gang_exp' => '25000',
-            'gang_id' => '1'
+            'gang_id' => '1',
+            'prefecture_id' => '1',
         ]);
 
         DB::table('users')->insert([
@@ -35,7 +36,8 @@ class DatabaseSeeder extends Seeder
             'health' => '100',
             'exp' => '50',
             'money' => '50000',
-            'gang_id' => '2'
+            'gang_id' => '2',
+            'prefecture_id' => '2',
         ]);
 
         DB::table('users')->insert([
@@ -45,7 +47,8 @@ class DatabaseSeeder extends Seeder
             'health' => '100',
             'exp' => '500000',
             'money' => '25600',
-            'gang_id' => '2'
+            'gang_id' => '2',
+            'prefecture_id' => '3',
         ]);
         
         DB::table('gangs')->insert([
@@ -209,6 +212,7 @@ class DatabaseSeeder extends Seeder
             ChatMessages::class,
             Races::class,
             Cars::class,
+            Prefectures::class,
         ]);
     }
 }

@@ -27,6 +27,8 @@ return new class extends Migration
             $table->integer('cooldown')->default(0);            
             $table->integer('money')->default(50);
             $table->timestamp('time_of_death')->nullable();
+            $table->foreignId('prefecture_id')->nullable();
+            $table->timestamp('jetlag_untill')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
