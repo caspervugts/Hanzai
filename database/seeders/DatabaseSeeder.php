@@ -36,8 +36,8 @@ class DatabaseSeeder extends Seeder
             'health' => '100',
             'exp' => '50',
             'money' => '50000',
-            'gang_id' => '2',
-            'prefecture_id' => '2',
+            'gang_id' => '1',
+            'prefecture_id' => '1',
         ]);
 
         DB::table('users')->insert([
@@ -47,8 +47,8 @@ class DatabaseSeeder extends Seeder
             'health' => '100',
             'exp' => '500000',
             'money' => '25600',
-            'gang_id' => '2',
-            'prefecture_id' => '3',
+            'gang_id' => '1',
+            'prefecture_id' => '1',
         ]);
         
         DB::table('gangs')->insert([
@@ -204,6 +204,70 @@ class DatabaseSeeder extends Seeder
             'description' => 'A balanced meal typically consisting of rice, fish or meat, and pickled or cooked vegetables, all neatly packed in a box.',
             'health_restore' => '30',
             'value' => '10000'
+        ]);
+
+        DB::table('crimes_gang')->insert([
+            'name' => 'Rob a konbini',
+            'description' => 'Robbing a konbini in a quiet suburban neighborhood',
+            'difficulty' => '50',
+            'exp' => '75',
+            'failure' => 'You got caught and sent to prison. You\'ll be released in 300 seconds.',
+            'success' => 'You were succesful in robbing a konbini. Woohoo. You took ',
+            'cooldown' => '300',
+            'min_money' => '1500',
+            'max_money' => '15000',
+            'required_gang_size' => '2',
+            'required_money' => '0',
+            'required_weapons' => '1',
+            'required_cars' => '1'            
+        ]);
+        
+        DB::table('crimes_gang')->insert([
+            'name' => 'Rob a Pachinko parlor',
+            'description' => 'Robbing a Pachinko parlor in a busy shopping district',
+            'difficulty' => '30',
+            'exp' => '150',
+            'failure' => 'You got caught and sent to prison. You\'ll be released in 400 seconds.',
+            'success' => 'You were succesful in robbing a Pachinko parlor. You took ',
+            'cooldown' => '400',
+            'min_money' => '5000',
+            'max_money' => '20000',
+            'required_gang_size' => '3',
+            'required_money' => '1000',
+            'required_weapons' => '2',
+            'required_cars' => '1' 
+        ]);
+
+        DB::table('crimes_gang')->insert([
+            'name' => 'Rob a jewelry store',
+            'description' => 'Rob a jewelry store in a high-end shopping district',
+            'difficulty' => '20',
+            'exp' => '200',
+            'failure' => 'You got caught and sent to prison. You\'ll be released in 240 seconds.',
+            'success' => 'You were succesful in robbing a jewelry store. Woohoo. You took ',
+            'cooldown' => '240',
+            'min_money' => '25000',
+            'max_money' => '45000',
+            'required_gang_size' => '3',
+            'required_money' => '2500',
+            'required_weapons' => '2',
+            'required_cars' => '2'  
+        ]);
+
+        DB::table('crimes_gang')->insert([
+            'name' => 'Rob a bank',
+            'description' => 'Robbing a high-security bank in the financial district',
+            'difficulty' => '10',
+            'exp' => '300',
+            'failure' => 'You got caught and sent to prison. You\'ll be released in 600 seconds.',
+            'success' => 'Holy shit, you robbed a bank. Congratulations. You took ',
+            'cooldown' => '600',
+            'min_money' => '40000',
+            'max_money' => '150000',
+            'required_gang_size' => '4',
+            'required_money' => '10000',
+            'required_weapons' => '4',
+            'required_cars' => '2'  
         ]);
 
         $this->call([

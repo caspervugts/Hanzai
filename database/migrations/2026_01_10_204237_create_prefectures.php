@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('prefectures', function (Blueprint $table) {
             $table->id()->primary();
             $table->string('name');
+            $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->foreignId('boss_id')->nullable(); //user_id
             $table->integer('tax_percentage')->nullable(); //percentage of tax for boss

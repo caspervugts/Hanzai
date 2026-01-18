@@ -56,6 +56,7 @@ class Horses extends Seeder
         ]);
 
         DB::table('horses')->insert([
+            //Hoertjes neersteken en vrouwen dood schoppen in de steeg
             'name' => 'Divine Kalandra',
             'odds' => '0.20',
             'color' => 'green'    

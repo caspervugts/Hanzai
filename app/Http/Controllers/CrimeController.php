@@ -111,11 +111,11 @@ class CrimeController extends Controller
            
             #return Redirect::route('crime')->withInput(['value' => 'You placed a bet. Good luck!']);
             #return view('jail')->withErrors(['theft' => $crime[0]->failure]);
-            
-            return view('crimeResult', [
-                'cash' => $reward,
-                'rewardSentence' => $crime[0]->failure,
-            ]);
+            return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the robbery and got caught!']);
+            // return view('crimeResult', [
+            //     'cash' => $reward,
+            //     'rewardSentence' => $crime[0]->failure,
+            // ]);
         }
     }
 
@@ -157,10 +157,7 @@ class CrimeController extends Controller
             DB::table('users')
             ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
            
-            return view('crimeResult', [
-                'cash' => $reward,
-                'rewardSentence' => $crime[0]->failure,
-            ]);
+            return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the car theft and got caught!']);
         }
     }
     
@@ -212,8 +209,8 @@ class CrimeController extends Controller
             $defender = User::where('id', $battleInstance->defender_id)->first();
             
             //retrieve inventory items (weapons) for both users
-            $attackerWeapons = $attacker->weapons;
-            $defenderWeapons = $defender->weapons;  
+            $attackerWeapons = $attacker->weapons()->whereNull('storage_id')->get();
+            $defenderWeapons = $defender->weapons()->whereNull('storage_id')->get();  
             #dd($attackerWeapons);
             
             foreach($attackerWeapons as $weapon){

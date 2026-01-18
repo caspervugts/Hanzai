@@ -48,6 +48,12 @@ Route::middleware(['auth', \App\Http\Middleware\CheckIfAlive::class])->group(fun
     Route::get('/gang/leave/{gangId}', [GangController::class, 'leaveGang'])->name('leaveGang');
     Route::get('/gang/approve/{userId}', [GangController::class, 'approveApplication'])->name('approveApplication');    
     Route::get('/gang/reject/{userId}', [GangController::class, 'rejectApplication'])->name('rejectApplication');
+    //gang crimes
+    Route::get('/gang/crime/start/{crimeId}', [GangController::class, 'startGangCrime'])->name('gangCrimes');    
+    Route::post('/gang/crime/start/letsgo/', [GangController::class, 'initiateGangCrime'])->name('initiateGangCrime');
+    Route::get('/gang/crime/approve/{gangCrimeId}', [GangController::class, 'acceptGangCrime'])->name('acceptGangCrime');    
+    Route::get('/gang/crime/reject/{gangCrimeId}', [GangController::class, 'rejectGangCrime'])->name('rejectGangCrime');
+    Route::get('/gang/crime/executeGangCrime', [GangController::class, 'executeGangCrime'])->name('executeGangCrime');
 
     Route::get('/gambling', [GamblingController::class, 'view'])->name('gambling');    
     Route::get('/gambling/race', [GamblingController::class, 'createRace']);    

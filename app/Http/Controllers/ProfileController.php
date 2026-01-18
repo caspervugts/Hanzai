@@ -76,7 +76,7 @@ class ProfileController extends Controller
     public function view(Request $request): View
     {
         $user = User::find(Auth::user()->id);
-        $weapons = $user->weapons;
+        $weapons = $user->weapons()->whereNull('storage_id')->get();
 
         $previousHits = DB::table('pvp_battle_instance')
         ->where('completed', 1)

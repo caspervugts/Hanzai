@@ -31,6 +31,8 @@ return new class extends Migration
             $table->id()->primary();
             $table->foreignId('weapon_id');
             $table->foreignId('user_id');
+            $table->foreignId('storage_id')->nullable();
+            $table->foreignId('gang_crime_id')->nullable();
             $table->integer('ammo_amount')->nullable();
         });
     }
