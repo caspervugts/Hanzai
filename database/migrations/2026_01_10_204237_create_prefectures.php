@@ -18,6 +18,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->foreignId('boss_id')->nullable(); //user_id
             $table->integer('tax_percentage')->nullable(); //percentage of tax for boss
+            $table->integer('investment_cost')->nullable();
+            $table->integer('travel_cost')->nullable();
             $table->timestamps();
         });
     }

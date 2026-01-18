@@ -77,7 +77,7 @@ class Weapons extends Seeder
             'item_id' => '2', // Glock-17
             'event_description_part_one' => 'fired a shot from his/her Glock-17 and shot',
             'event_description_part_two' => 'in the foot dealing 5 damage. Stupid ass.',
-            'event_chance' => '15',
+            'event_chance' => '5',
             'event_damage' => '5',
             'event_recipient' => '1' 
         ]); 
@@ -115,7 +115,7 @@ class Weapons extends Seeder
             'item_id' => '4', // Ak-47
             'event_description_part_one' => 'fired a shot from his/her Ak-47. The bullet ricocheted off the wall and hits',
             'event_description_part_two' => 'in the leg dealing 25 damage. Unlucky.',
-            'event_chance' => '15',
+            'event_chance' => '5',
             'event_damage' => '25',
             'event_recipient' => '1' 
         ]); 
@@ -143,7 +143,7 @@ class Weapons extends Seeder
             'item_id' => '1', // Knife
             'event_description_part_one' => 'hurt himself/herself trying to stab',
             'event_description_part_two' => 'in the arm dealing 2 damage to him/herself.',
-            'event_chance' => '20',
+            'event_chance' => '5',
             'event_damage' => '2',
             'event_recipient' => '1'
         ]); 
@@ -189,7 +189,7 @@ class Weapons extends Seeder
             'item_id' => '3', // Uzi
             'event_description_part_one' => 'fired a shot from his/her Uzi. The bullet ricocheted off the wall and doesn\'t hit',
             'event_description_part_two' => ' but instead himself/herself in the leg dealing 10 damage. Unlucky.',
-            'event_chance' => '15',
+            'event_chance' => '5',
             'event_damage' => '10',
             'event_recipient' => '1'
         ]); 

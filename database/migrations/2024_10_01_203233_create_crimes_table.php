@@ -55,6 +55,8 @@ return new class extends Migration
             $table->integer('gangcrimeid')->nullable();             
             $table->integer('cash');
             $table->integer('carid')->nullable();
+            $table->integer('prefecture_boss_cut')->nullable();
+            $table->foreignId('prefecture_boss_id')->nullable();
             $table->timestamp('createdate')->useCurrent();
             $table->timestamp('releasedate')->nullable();
         });

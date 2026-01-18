@@ -18,7 +18,7 @@ use DB;
 
 class GangController extends Controller
 {
-    public function view(Request $request): View{         
+    public function view(Request $request): View{                     
         //check if user is in jail     
         $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
 
@@ -51,15 +51,17 @@ class GangController extends Controller
                 ->where('completed', 0)
                 ->get();
                 
-                $recentGangCrimes = DB::table('crimes_gang_performed')->join('crimes_gang', 'crimes_gang_performed.gang_crime_id', '=', 'crimes_gang.id')->limit(3)->get();
+                $recentGangCrimes = DB::table('crimes_gang_performed')->join('crimes_gang', 'crimes_gang_performed.gang_crime_id', '=', 'crimes_gang.id')->where('crimes_gang_performed.completed', 2)->orderBy('crimes_gang_performed.id', 'desc')->limit(3)->get();
 
+                $membersInJail = DB::table('crimes_performed')->where('releasedate', '>', Carbon::now())->get();
+                #dd($membersInJail);
                 if($boss[0]->id == Auth::user()->id){                    
                     $approvalRequests = DB::table('gang_approval')->join('users', 'gang_approval.user_id', '=', 'users.id')->where('gang_approval.gang_id', Auth::user()->gang_id)->where('gang_approval.status', '0')->get();
                     $userBoss = true;
-                    return view('gang', ['user' => $request->user(), 'openInvite'=>$openInvite, 'ongoingCrime'=>$ongoingCrime, 'gangCrimes' => $gangCrimes, 'gangMembers' => $gangMembers, 'gangs' => $gangs, 'isBoss' => $boss, 'approvalRequests' => $approvalRequests, 'userBoss' => $userBoss, 'recentGangCrimes' => $recentGangCrimes]);
+                    return view('gang', ['user' => $request->user(), 'openInvite'=>$openInvite, 'ongoingCrime'=>$ongoingCrime, 'gangCrimes' => $gangCrimes, 'gangMembers' => $gangMembers, 'gangs' => $gangs, 'isBoss' => $boss, 'approvalRequests' => $approvalRequests, 'userBoss' => $userBoss, 'recentGangCrimes' => $recentGangCrimes, 'membersInJail' => $membersInJail]);
                 }
 
-                return view('gang', ['user' => $request->user(), 'openInvite'=>$openInvite, 'gangCrimes' => $gangCrimes, 'ongoingCrime'=>$ongoingCrime, 'gangMembers' => $gangMembers, 'gangs' => $gangs, 'isBoss' => $boss, 'recentGangCrimes' => $recentGangCrimes]);
+                return view('gang', ['user' => $request->user(), 'openInvite'=>$openInvite, 'gangCrimes' => $gangCrimes, 'ongoingCrime'=>$ongoingCrime, 'gangMembers' => $gangMembers, 'gangs' => $gangs, 'isBoss' => $boss, 'recentGangCrimes' => $recentGangCrimes, 'membersInJail' => $membersInJail]);
             }
         }else{
              return view('jail', ['user' => $request->user()]);
@@ -334,38 +336,74 @@ class GangController extends Controller
         }
     }
 
-    public function executeGangCrime(Request $request){         
-        //check if user is in jail     
-        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
+    public function executeGangCrime(){                
+        //get all open gang crime
+        $ongoingCrime = DB::table('crimes_gang_performed')            
+        ->where('completed', 1)
+        ->get();
 
-        if(empty($results)){
-            //get all open gang crime
-            $ongoingCrime = DB::table('crimes_gang_performed')            
-            ->where('completed', 1)
+        foreach($ongoingCrime as $crime){
+            //check if members have declined    
+            $declinedInvites = DB::table('crimes_gang_invites')
+            ->where('gang_crime_id', $crime->id)
+            ->where('accepted', 2)
             ->get();
 
-            foreach($ongoingCrime as $crime){
-                //check if members have declined    
-                $declinedInvites = DB::table('crimes_gang_invites')
-                ->where('gang_crime_id', $crime->id)
-                ->where('accepted', 2)
-                ->get();
+            if(!$declinedInvites->isEmpty()){
+                //mark gang crime as failed         
+                #dd($declinedInvites, $crime);           
+                DB::table('crimes_gang_performed')
+                ->where('id', $crime->id)
+                ->update(['completed' => 2, 'result' => 'The gang crime has failed due to a member declining the invitation.']);            
 
-                if(!$declinedInvites->isEmpty()){
-                    //mark gang crime as failed         
-                    #dd($declinedInvites, $crime);           
+                DB::table('crimes_gang_invites')
+                ->where('gang_crime_id', $crime->id)
+                ->update(['completed' => 2]);  
+
+                DB::table('crimes_gang_storage')
+                ->where('gang_crime_id', $crime->id)
+                ->delete();
+        
+                DB::table('user_weapon')
+                ->where('gang_crime_id', $crime->id)
+                ->update(['gang_crime_id' => null, 'storage_id' => null]);
+
+                DB::table('car_user')
+                ->where('gang_crime_id', $crime->id)
+                ->update(['gang_crime_id' => null, 'storage_id' => null]);
+                
+                $gangCrime = DB::table('crimes_gang')->where('id', '=', $crime->gang_crime_id)->get();
+
+                DB::table('users')->where('id', $crime->user_id)->increment('money', $gangCrime[0]->required_money);
+            }else{
+                $gangCrime = DB::table('crimes_gang')->where('id', '=', $crime->gang_crime_id)->get();
+                $roll = rand(1, 100);
+                $reward = rand($gangCrime[0]->min_money, $gangCrime[0]->max_money);
+                
+                $rewardSentence = $gangCrime[0]->success.' '.$reward.' yen!';
+                //Roll to see if crime is succesfull
+                if ($roll < $gangCrime[0]->difficulty){
                     DB::table('crimes_gang_performed')
                     ->where('id', $crime->id)
-                    ->update(['completed' => 2, 'result' => 'The gang crime has failed due to a member declining the invitation.']);            
-
-                    DB::table('crimes_gang_invites')
+                    ->update(['completed' => 2, 'result' => $rewardSentence, 'cash' => $reward]);
+                
+                    $crewMembers = DB::table('crimes_gang_invites')
                     ->where('gang_crime_id', $crime->id)
-                    ->update(['completed' => 2]);  
+                    ->get();
 
-                    DB::table('crimes_gang_storage')
-                    ->where('gang_crime_id', $crime->id)
-                    ->delete();
-            
+                    foreach($crewMembers as $member){                           
+                        DB::table('users')
+                        ->where('id', $member->user_id)->increment('money', intval($reward / (count($crewMembers))));
+
+                        DB::table('users')
+                        ->where('id', $member->user_id)->increment('exp', intval($gangCrime[0]->exp));
+
+                        DB::table('crimes_performed')->insert([
+                        'userid' => $member->user_id,
+                        'gangcrimeid' => $crime->id,
+                        'cash' => $reward / (count($crewMembers))]);
+                    }
+
                     DB::table('user_weapon')
                     ->where('gang_crime_id', $crime->id)
                     ->update(['gang_crime_id' => null, 'storage_id' => null]);
@@ -374,102 +412,122 @@ class GangController extends Controller
                     ->where('gang_crime_id', $crime->id)
                     ->update(['gang_crime_id' => null, 'storage_id' => null]);
                     
-                    $gangCrime = DB::table('crimes_gang')->where('id', '=', $crime->gang_crime_id)->get();
+                    #return redirect()->route('crime')->with('success', $rewardSentence);
 
-                    DB::table('users')->where('id', $crime->user_id)->increment('money', $gangCrime[0]->required_money);
+                    // return view('crimeResult', [
+                    //     'cash' => $reward,
+                    //     'rewardSentence' => $rewardSentence,
+                    // ]);
                 }else{
+                    $releaseDate =  Carbon::now()->addSeconds($gangCrime[0]->cooldown);
                     $gangCrime = DB::table('crimes_gang')->where('id', '=', $crime->gang_crime_id)->get();
-                    $roll = rand(1, 100);
-                    $reward = rand($gangCrime[0]->min_money, $gangCrime[0]->max_money);
-                    
-                    $rewardSentence = $gangCrime[0]->success.' '.$reward.' yen!';
-                    //Roll to see if crime is succesfull
-                    #if ($roll < $gangCrime[0]->difficulty){
-                    if (1==1){
-                        DB::table('crimes_gang_performed')
-                        ->where('id', $crime->id)
-                        ->update(['completed' => 2, 'result' => $rewardSentence, 'cash' => $reward]);
-                  
-                        $crewMembers = DB::table('crimes_gang_invites')
-                        ->where('gang_crime_id', $crime->id)
-                        ->get();
 
-                        foreach($crewMembers as $member){                           
-                            DB::table('users')
-                            ->where('id', $member->user_id)->increment('money', intval($reward / (count($crewMembers))));
+                    DB::table('crimes_gang_performed')
+                    ->where('id', $crime->id)
+                    ->update(['completed' => 2, 'result' => $gangCrime[0]->failure, 'cash' => 0, 'releasedate' => $releaseDate]);
 
-                            DB::table('users')
-                            ->where('id', $member->user_id)->increment('exp', intval($gangCrime[0]->exp));
+                    $crewMembers = DB::table('crimes_gang_invites')
+                    ->where('gang_crime_id', $crime->id)
+                    ->get();
 
-                            DB::table('crimes_performed')->insert([
+                    foreach($crewMembers as $member){                                                                               
+                        DB::table('crimes_performed')->insert([
                             'userid' => $member->user_id,
                             'gangcrimeid' => $crime->id,
-                            'cash' => $reward / (count($crewMembers))]);
-                        }
+                            'cash' => 0,
+                            'releasedate' => $releaseDate,
+                            'createdate' => Carbon::now()            
+                        ]);
 
-                        DB::table('user_weapon')
-                        ->where('gang_crime_id', $crime->id)
-                        ->update(['gang_crime_id' => null, 'storage_id' => null]);
-
-                        DB::table('car_user')
-                        ->where('gang_crime_id', $crime->id)
-                        ->update(['gang_crime_id' => null, 'storage_id' => null]);
-                        
-                        #return redirect()->route('crime')->with('success', $rewardSentence);
-
-                        // return view('crimeResult', [
-                        //     'cash' => $reward,
-                        //     'rewardSentence' => $rewardSentence,
-                        // ]);
-                    }else{
-                        $releaseDate =  Carbon::now()->addSeconds($gangCrime[0]->cooldown);
-                        $gangCrime = DB::table('crimes_gang')->where('id', '=', $crime->gang_crime_id)->get();
-
-                        DB::table('crimes_gang_performed')
-                        ->where('id', $crime->id)
-                        ->update(['completed' => 2, 'result' => $gangCrime[0]->failure, 'cash' => 0, 'releasedate' => $releaseDate]);
-
-                        $crewMembers = DB::table('crimes_gang_invites')
-                        ->where('gang_crime_id', $crime->id)
-                        ->get();
-
-                        foreach($crewMembers as $member){                                                                               
-                            DB::table('crimes_performed')->insert([
-                                'userid' => $member->user_id,
-                                'gangcrimeid' => $crime->id,
-                                'cash' => 0,
-                                'releasedate' => $releaseDate,
-                                'createdate' => Carbon::now()            
-                            ]);
-
-                            DB::table('users')
-                            ->where('id', $member->user_id)->increment('exp', $gangCrime[0]->exp);   
-                        }
-
-                        DB::table('user_weapon')
-                        ->where('gang_crime_id', $crime->id)
-                        ->delete();
-
-                        DB::table('car_user')
-                        ->where('gang_crime_id', $crime->id)
-                        ->delete();
-                        
-                        #$reward = 0;                                            
-                    
-                        #return Redirect::route('crime')->withInput(['value' => 'You placed a bet. Good luck!']);
-                        #return view('jail')->withErrors(['theft' => $crime[0]->failure]);
-                        #return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the robbery and got caught!']);
-                        // return view('crimeResult', [
-                        //     'cash' => $reward,
-                        //     'rewardSentence' => $crime[0]->failure,
-                        // ]);
+                        DB::table('users')
+                        ->where('id', $member->user_id)->increment('exp', $gangCrime[0]->exp);   
                     }
+
+                    DB::table('user_weapon')
+                    ->where('gang_crime_id', $crime->id)
+                    ->delete();
+
+                    DB::table('car_user')
+                    ->where('gang_crime_id', $crime->id)
+                    ->delete();
+                    
+                    #$reward = 0;                                            
+                
+                    #return Redirect::route('crime')->withInput(['value' => 'You placed a bet. Good luck!']);
+                    #return view('jail')->withErrors(['theft' => $crime[0]->failure]);
+                    #return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the robbery and got caught!']);
+                    // return view('crimeResult', [
+                    //     'cash' => $reward,
+                    //     'rewardSentence' => $crime[0]->failure,
+                    // ]);
                 }
+            }
+            
+        }
+        //execute gang crime logic here
+
+        #return Redirect::route('gang')->withInput(['value' => 'Gang crime executed.']);
+    
+    }
+
+    public function bailMember($userId, Request $request){         
+        //check if user is in jail     
+        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
+
+        if(empty($results)){
+            $bailAmount = 20000; // Fixed bail amount, can be modified as needed
+
+            $gangMoney = DB::select("SELECT gang_money FROM gangs WHERE id = ".Auth::user()->gang_id);
+
+           $jailRecord = DB::table('crimes_performed')->where('userid', $userId)->where('releasedate', '>', now())->first();
+            #dd($jailRecord);
+            if($jailRecord === null){
+
+                #dd('here');
+                return Redirect::route('gang')->with(['error' => 'This gang member is not in jail.']);
                 
             }
-            //execute gang crime logic here
 
-            #return Redirect::route('gang')->withInput(['value' => 'Gang crime executed.']);
+            if($gangMoney[0]->gang_money >= $bailAmount){            
+                DB::table('gangs')
+                    ->where('id', Auth::user()->gang_id)->decrement('gang_money', $bailAmount);
+                    
+                DB::table('crimes_performed')
+                    ->where('userid', $userId)
+                    ->update(['releasedate' => Carbon::now()]); 
+
+                return Redirect::route('gang')->with(['success' => 'You have posted bail for the gang member using ¥'.$bailAmount.' from the gang\'s funds.']);
+            }
+            else{
+                return Redirect::route('gang')->with(['error' => 'The gang doesn\'t have enough money to post bail for this member.']);
+            }
+        }else{
+             return view('jail', ['user' => $request->user()]);
+        }
+    }
+
+    public function depositToGang($gangId, Request $request){         
+        //check if user is in jail     
+        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
+
+        if(empty($results)){
+            $amount = $request->input('amount');
+
+            $userMoney = DB::select("SELECT money FROM users WHERE id = ".Auth::user()->id);
+
+            if($userMoney[0]->money >= $amount){            
+                DB::table('users')
+                    ->where('id', Auth::user()->id)->decrement('money', $amount);
+
+                DB::table('gangs')
+                    ->where('id', $gangId)
+                    ->increment('gang_money', $amount); 
+
+                return Redirect::route('gang')->with(['success' => 'You have deposited ¥'.$amount.' into the gang\'s funds.']);
+            }
+            else{
+                return Redirect::route('gang')->with(['error' => 'You don\'t have enough money to deposit that amount.']);
+            }
         }else{
              return view('jail', ['user' => $request->user()]);
         }

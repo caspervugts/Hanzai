@@ -9,13 +9,19 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             
             {{-- Success Message --}}
-            @isset($message)
+            @if (session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                    <strong>{{ $message }}</strong>
+                    <strong>{{ session('success') }}</strong>
                 </div>
-            @endisset
+            @endif
+            {{-- Error Message --}}
+            @if (session('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                    <strong>{{ session('error') }}</strong>
+                </div>
+            @endif
 
-            @if (isset($input['value']))
+            @if (session($input = 'value'))
                 <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative">
                     <strong>{{ $input['value'] }}</strong>
                 </div>
@@ -50,9 +56,15 @@
                     <div class="mb-4">
                         <p class="text-sm text-gray-600 mb-1">{{ __("Description") }}</p>
                         <p class="text-gray-800">{{ $gangs[0]->description }}</p>
-                    </div>
-
+                    </div>                   
+   
                     <div class="pt-4 border-t">
+                        <form method="POST" action="/gang/deposit/{{ $gangs[0]->id }}" class="flex items-left justify-end space-x-2">
+                            @csrf
+                            <input type="number" name="amount" min="1" placeholder="Amount" value="{{ old('amount') }}" class="w-24 border rounded px-2 py-1">
+                            <button type="submit" class="px-3 py-1 bg-indigo-600 border rounded hover:bg-red-700">{{ __('Deposit') }}</button>
+                        </form>
+
                         <a href="/gang/leave/{{ $gangs[0]->id }}">
                             <button class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                 {{ __("Leave Gang") }}
@@ -80,6 +92,11 @@
                                     <span>{{ __("EXP") }}: <strong>{{ number_format($member->exp) }}</strong></span>
                                     <span>{{ __("Money") }}: <strong>¥{{ number_format($member->money) }}</strong></span>
                                 </div>
+                                
+                                <a href="/gang/bail/{{ $member->id }}"><button class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                                    {{  "Post bail for 20,000¥" }}
+                                </button></a>
+                                
                             </div>
                         @endforeach
                     </div>

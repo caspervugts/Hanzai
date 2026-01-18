@@ -6,6 +6,7 @@ use App\Http\Controllers\GamblingController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\GangController;
+use App\Http\Controllers\PrefectureController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatRoomController;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,11 @@ Route::middleware(['auth', \App\Http\Middleware\CheckIfAlive::class])->group(fun
     #Route::post('/city/change', [CityController::class, 'changeCity'])->name('changeCity');
     #Route::get('/city/getcities', [CityController::class, 'getCities'])->name('getCities');
 
+    Route::get('/prefecture', [PrefectureController::class, 'viewPrefecture'])->name('prefecture');
+    Route::get('/travel', [PrefectureController::class, 'viewTravel'])->name('travel');
+    Route::get('/prefecture/claim/{prefectureId}', [PrefectureController::class, 'claimPrefecture'])->name('claimPrefecture');
+    Route::get('/prefecture/travel/{prefectureId}', [PrefectureController::class, 'travelToPrefecture'])->name('travelToPrefecture');
+
     Route::get('/city/food/buy/{foodId}', [ShopController::class, 'buyFood'])->name('buyFood');
     Route::get('/shop/buy/{weaponId}/{value}', [ShopController::class, 'buyWeapon'])->name('buyWeapon');
 
@@ -46,8 +52,10 @@ Route::middleware(['auth', \App\Http\Middleware\CheckIfAlive::class])->group(fun
     Route::post('/gang/create', [GangController::class, 'createGang'])->name('createGang');
     Route::get('/gang/apply/{gangId}', [GangController::class, 'applyToGang'])->name('applyToGang');
     Route::get('/gang/leave/{gangId}', [GangController::class, 'leaveGang'])->name('leaveGang');
+    Route::post('/gang/deposit/{gangId}', [GangController::class, 'depositToGang'])->name('depositToGang');
     Route::get('/gang/approve/{userId}', [GangController::class, 'approveApplication'])->name('approveApplication');    
     Route::get('/gang/reject/{userId}', [GangController::class, 'rejectApplication'])->name('rejectApplication');
+    Route::get('/gang/bail/{userId}', [GangController::class, 'bailMember'])->name('bailMember');
     //gang crimes
     Route::get('/gang/crime/start/{crimeId}', [GangController::class, 'startGangCrime'])->name('gangCrimes');    
     Route::post('/gang/crime/start/letsgo/', [GangController::class, 'initiateGangCrime'])->name('initiateGangCrime');
@@ -67,7 +75,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckIfAlive::class])->group(fun
     Route::get('/garage', [ProfileController::class, 'viewGarage'])->name('garage');
     //Route::get('/shop', [ShopController::class, 'viewShop'])->name('shop');
     
-    Route::get('/garage/sell/{carId}/{value}', [ProfileController::class, 'sellCar'])->name('sellCar');
+    Route::get('/garage/sell/{userId}/{carId}', [ProfileController::class, 'sellCar'])->name('sellCar');
     Route::get('/combatlog', [ProfileController::class, 'combatlog'])->name('combatlog');
     Route::get('/help', [ProfileController::class, 'help'])->name('help');
     Route::get('/death', [ProfileController::class, 'death'])->name('death');

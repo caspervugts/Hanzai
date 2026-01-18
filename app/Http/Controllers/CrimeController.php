@@ -74,14 +74,30 @@ class CrimeController extends Controller
         $roll = rand(1, 100);
         $reward = rand($crime[0]->min_money, $crime[0]->max_money);
         
-        $rewardSentence = $crime[0]->success.' '.$reward.' yen!';
+        $prefectureTax = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->tax_percentage;
+        $prefectureBoss = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->boss_id;
 
+        if(!$prefectureTax){
+            $prefectureTax = 0;
+        }
+        $bossCut = intval($reward * ($prefectureTax / 100));
+
+        if($prefectureBoss == null){
+            $rewardSentence = $crime[0]->success.' ¥'.$reward.'.';
+        }else{
+            $rewardSentence = $crime[0]->success.' ¥'.$reward.' and gave ¥'.$bossCut.' to the prefecture boss.';
+        }
+        
+        //dd($prefectureTax);
+        #$prefectureBossCut = intval($reward * 0.1);
         //Roll to see if crime is succesfull
         if ($roll < $crime[0]->difficulty){
             DB::table('crimes_performed')->insert([
                 'userid' => Auth::user()->id,
                 'crimeid' => $whichCrime,
-                'cash' => $reward          
+                'cash' => $reward,
+                'prefecture_boss_cut' => $bossCut,
+                'prefecture_boss_id' => $prefectureBoss
             ]);
 
             DB::table('users')
@@ -89,6 +105,11 @@ class CrimeController extends Controller
 
             DB::table('users')
             ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
+
+            if($bossCut > 0){
+                DB::table('users')
+                ->where('id', $prefectureBoss)->increment('money', $bossCut);
+            }
 
             return redirect()->route('crime')->with('success', $rewardSentence);
 
@@ -195,7 +216,7 @@ class CrimeController extends Controller
 
     public function performHit(){
         //retrieve battle instance
-        $battleInstance = DB::table('pvp_battle_instance')->where('completed', 0);
+        $battleInstance = DB::table('pvp_battle_instance')->where('completed', 0)->where('battle_starttime', '<=', Carbon::now());
         #dd($battleInstance);
         // if(!$battleInstance){
         //     return redirect()->route('crime')->with('error', 'Hit not found.'); 

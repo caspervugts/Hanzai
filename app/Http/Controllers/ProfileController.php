@@ -61,7 +61,12 @@ class ProfileController extends Controller
                     'move_recipient_name' => User::where('id', $event->move_recipient_id)->first()->name,
                 ];
             }
-        }        
+        }      
+        
+        DB::table('prefectures')
+            ->where('boss_id', Auth::user()->id)
+            ->update(['boss_id' => null]);
+
         #$aliveTime = $request->user()->time_of_death->addHours(24);
         $aliveTime = $request->user()->time_of_death;
         #d($event->move_recipient_id->first()->name);
@@ -143,26 +148,49 @@ class ProfileController extends Controller
     public function viewGarage(Request $request): View
     {
         $user = User::find(Auth::user()->id);
-        $cars = $user->cars;  // Retrieves all cars associated with the user
+        #$cars = $user->cars;  // Retrieves all cars associated with the user
+        $cars = DB::table('car_user')
+            ->join('cars', 'car_user.car_id', '=', 'cars.id')
+            ->where('car_user.user_id', '=', Auth::user()->id)
+            ->where('car_user.gang_crime_id', '==', null)
+            ->select('cars.*', 'car_user.id as pivot_id', 'car_user.value as value', 'car_user.user_id as user_id', 'car_user.id as car_id')
+            ->get();
 
         return view('garage', [
             'user' => $request->user(), 'cars' => $cars,
         ]);
     }
 
-    public function sellCar(Request $request, $carId, $value): RedirectResponse
+    public function sellCar(Request $request, $carId, $userId): RedirectResponse
     {    
-        DB::table('users')
-            ->where('id', Auth::user()->id)->increment('money', $value);
+        
         
         $user = User::findOrFail(Auth::user()->id);
-        //dd($carId);
+        #dd($carId, $userId);
+        $carValue = DB::table('car_user')->where('id', '=', $carId)->where('user_id', '=', $userId)->get();
+
+        $prefectureTax = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->tax_percentage;
+        $prefectureBoss = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->boss_id;
+        #dd($carValue[0]->value);
         //$user->cars()->detach($carId);
 
-        $deleted = DB::table('car_user')->where('id', '=', $carId)->delete();
+        DB::table('users')->where('id', Auth::user()->id)->increment('money', $carValue[0]->value);
+
+        if(!$prefectureTax){
+            $prefectureTax = 0;
+        }
+        $bossCut = intval($carValue[0]->value * ($prefectureTax / 100));
+
+        if($bossCut < 0){
+            $rewardSentence = $carValue[0]->value.' ¥'.   $carValue[0]->value.'.';
+        }else{
+            $rewardSentence = ' ¥'.$carValue[0]->value.' and gave ¥'.$bossCut.' to the prefecture boss.';
+        }
+
+        $deleted = DB::table('car_user')->where('id', '=', $carId)->where('user_id', '=', $userId)->delete();
 
         //$cars = $user->cars;  // Retrieves all cars associated with the user
-        return Redirect::route('garage');
+        return Redirect::route('garage')->with('success', 'You have sold your car for '.$rewardSentence);
 
         //return Redirect::route('garage');
         // return view('garage', [

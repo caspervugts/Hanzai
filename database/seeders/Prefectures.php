@@ -15,44 +15,30 @@ class Prefectures extends Seeder
     {
         DB::table('prefectures')->insert([
             'id' => 1,
-            'name' => 'Hokkaidō',
-            'tax_percentage' => 2,
+            'name' => 'Tokyo',
+            'description' => 'The capital city and most populous prefecture of Japan, known for its bustling urban life and rich culture.',
+            'investment_cost' => 20000,
+            'tax_percentage' => 10,
+            'travel_cost' => 2000,
         ]);
 
         DB::table('prefectures')->insert([
             'id' => 2,
-            'name' => 'Aomori',
-            'tax_percentage' => 1,
-        ]);
-
-        DB::table('prefectures')->insert([
-            'id' => 3,
-            'name' => 'Iwate',
-            'tax_percentage' => 10,
-        ]);
-
-        DB::table('prefectures')->insert([
-            'id' => 4,
-            'name' => 'Miyagi',
-            'tax_percentage' => 5,
+            'name' => 'Kanagawa',
+            'description' => 'A prefecture located south of Tokyo, famous for its beautiful coastline and vibrant cities.',
+            'investment_cost' => 15000,
+            'tax_percentage' => 8,
+            'travel_cost' => 1500,
         ]);
         
         DB::table('prefectures')->insert([
-            'id' => 5,
-            'name' => 'Akita',
-            'tax_percentage' => 2,
+            'id' => 3,
+            'name' => 'Osaka',
+            'description' => 'A major commercial center in Japan, known for its modern architecture and delicious street food.',
+            'investment_cost' => 10000,
+            'tax_percentage' => 5,
+            'travel_cost' => 1000,
         ]);
 
-        DB::table('prefectures')->insert([
-            'id' => 6,
-            'name' => 'Yamagata',
-            'tax_percentage' => 3,
-        ]);
-
-        DB::table('prefectures')->insert([
-            'id' => 7,
-            'name' => 'Fukushima',
-            'tax_percentage' => 4,
-        ]);
     }
 }

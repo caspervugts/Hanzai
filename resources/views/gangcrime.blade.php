@@ -137,7 +137,7 @@
                                     @endforeach
                                 </div>
                             @else
-                                <p class="text-gray-600 italic">{{ __('No available cars. You may need to purchase cars for this crime.') }}</p>
+                                <p class="text-gray-600 italic">{{ __('No available cars. You need to steal cars for this crime.') }}</p>
                             @endif
                         </div>
                     </div>
@@ -164,7 +164,7 @@
                                     @endforeach
                                 </div>
                             @else
-                                <p class="text-gray-600 italic">{{ __('No available weapons. You may need to purchase weapons for this crime.') }}</p>
+                                <p class="text-gray-600 italic">{{ __('No available weapons. You need to purchase weapons for this crime.') }}</p>
                             @endif
                         </div>
                     </div>

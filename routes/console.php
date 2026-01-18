@@ -17,10 +17,14 @@ Schedule::call(function () {
 })->hourlyAt(59);
 
 Schedule::call(function () {
-    $deathtimer = app()->call('App\Http\Controllers\ProfileController@emptyTimeOfDeath');
-    $combat = app()->call('App\Http\Controllers\CrimeController@performHit');
+    
+    $gangcrimetimer = app()->call('App\Http\Controllers\GangController@executeGangCrime');
+    $combat = app()->call('App\Http\Controllers\CrimeController@performHit');    
 })->everyTenSeconds();
 
+Schedule::call(function () {
+    $deathtimer = app()->call('App\Http\Controllers\ProfileController@emptyTimeOfDeath');
+})->everyTwoHours($minutes = 0);
 #->everyMinute();
 
 // Schedule::call(function () {

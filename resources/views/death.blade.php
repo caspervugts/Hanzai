@@ -9,9 +9,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <p>Unfortunately, your character has been hospitalized. You are unable to perform any actions for the time being. You have lost all your money, inventory and half of your experience.</p>
+                    <p>Unfortunately, your character has been hospitalized. You are unable to perform any actions for the time being. You have lost all your money, inventory and half of your experience. Furthermore you've lost control of all the prefectures you previously owned. </p>
 </br>
-                    <p>You'll be able to continue playing after 24 hours.</p>
+                    <p>You'll be able to continue playing after 3 hours.</p>
 
                     <p> <br/> Time of death: {{ $user->time_of_death }} </p>
                     @if(!empty($combats) && count($combats) > 0)
