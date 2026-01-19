@@ -64,7 +64,11 @@ class GangController extends Controller
                 return view('gang', ['user' => $request->user(), 'openInvite'=>$openInvite, 'gangCrimes' => $gangCrimes, 'ongoingCrime'=>$ongoingCrime, 'gangMembers' => $gangMembers, 'gangs' => $gangs, 'isBoss' => $boss, 'recentGangCrimes' => $recentGangCrimes, 'membersInJail' => $membersInJail]);
             }
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -89,7 +93,11 @@ class GangController extends Controller
 
             return Redirect::route('gang')->withInput(['value' => 'You have applied to join the gang.']);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -108,7 +116,11 @@ class GangController extends Controller
 
             return Redirect::route('gang')->withInput(['value' => 'You have approved the gang application.']);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -123,7 +135,10 @@ class GangController extends Controller
 
             return Redirect::route('gang')->withInput(['value' => 'You have rejected the gang application.']);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -148,7 +163,10 @@ class GangController extends Controller
 
             return Redirect::route('gang')->withInput(['value' => 'You have left the gang.']);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -207,7 +225,10 @@ class GangController extends Controller
             return view('gangcrime', ['user' => $request->user(), 'availableGangMembers' => $availableGangMembers, 'availableCars' => $availableCars, 'availableWeapons' => $availableWeapons, 'crimeDetails' => $crimeDetails]);
             
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -288,7 +309,11 @@ class GangController extends Controller
 
             return Redirect::route('gang')->withInput(['value' => 'Gang crime initiated.']);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -313,7 +338,10 @@ class GangController extends Controller
             
             return Redirect::route('gang')->withInput(['value' => 'You have accepted the gang crime invitation. The crime will commence once all members have accepted.']);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }   
 
@@ -332,7 +360,10 @@ class GangController extends Controller
                 ->update(['completed' => 1]);
             return Redirect::route('gang')->withInput(['value' => 'You have rejected the gang crime invitation.']);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -502,7 +533,10 @@ class GangController extends Controller
                 return Redirect::route('gang')->with(['error' => 'The gang doesn\'t have enough money to post bail for this member.']);
             }
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -529,7 +563,10 @@ class GangController extends Controller
                 return Redirect::route('gang')->with(['error' => 'You don\'t have enough money to deposit that amount.']);
             }
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 

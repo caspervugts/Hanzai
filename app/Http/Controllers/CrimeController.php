@@ -20,6 +20,7 @@ class CrimeController extends Controller
      */
     public function view(Request $request): View{              
         $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
+        #dd($timeLeft);
 
         if(empty($results)){
             $robbery = DB::table('crimes_robbery')->select('difficulty', 'description')->get();
@@ -65,7 +66,11 @@ class CrimeController extends Controller
 
             return view('crime', ['user' => $request->user(), 'robdata' => $robbery, 'cardata' => $cartheft, 'users' => $allusers, 'currentCity' => $currentCity, 'previousHits' => $previousHits, 'previousHitsEvents' => $previousHitsEvents, 'eventDescriptions' => $eventDescriptions]);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            #dd($finalTime);
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 

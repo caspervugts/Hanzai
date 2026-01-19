@@ -26,7 +26,11 @@ class ShopController extends Controller
 
             return view('shop', ['user' => $request->user(), 'weapons' => $weapons]);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
