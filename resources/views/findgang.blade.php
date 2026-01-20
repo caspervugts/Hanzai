@@ -58,26 +58,26 @@
             <br/>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 text-black-900">
-                    @if (isset($canCreateGang) and $canCreateGang == true)
-                        <p><b>{{ "Or create your own gang" }}</b>  &nbsp; 
-                            
-                        <form method="POST" action="/gang/create">
-                            @csrf
+                    
+                    <p><b>{{ "Or create your own gang" }}</b>  &nbsp; 
+                        
+                    <form method="POST" action="/gang/create">
+                        @csrf
 
-                            <label>
-                                Name:<br/>
-                                <input type="text" name="name">
-                            </label>
-                            <br/>
-                            <label>
-                                Description:<br/>
-                                <input type="text" name="description">
-                            </label><br/><br/>  
-                            <button class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150" type="submit">Create gang</button>
-                        </form>
+                        <label>
+                            Name:<br/>
+                            <input type="text" name="name">
+                        </label>
+                        <br/>
+                        <label>
+                            Description:<br/>
+                            <input type="text" name="description">
+                        </label><br/><br/>  
+                        <button class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150" type="submit">Create gang</button>
+                    </form>
 
-                    </p>
-                    @endif                                                
+                </p>
+                                                                   
                 </div> 
             </div>
         </div>        

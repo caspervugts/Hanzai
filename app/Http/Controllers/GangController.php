@@ -186,14 +186,14 @@ class GangController extends Controller
        
         $gangMembers = DB::table('users')->where('gang_id', Auth::user()->gang_id)->get();
         $boss = DB::table('users')->where('id', $gangs[0]->gang_boss_id)->get();
-        
+        $gangCrimes = DB::table('crimes_gang')->get();
         if($boss[0]->id == Auth::user()->id){                    
             $approvalRequests = DB::table('gang_approval')->join('users', 'gang_approval.user_id', '=', 'users.id')->where('gang_approval.gang_id', Auth::user()->gang_id)->where('gang_approval.status', '0')->get();
             $userBoss = true;
-            return view('gang', ['user' => $request->user(), 'gangMembers' => $gangMembers, 'gangs' => $gangs, 'isBoss' => $boss, 'approvalRequests' => $approvalRequests, 'userBoss' => $userBoss]);
+            return view('gang', ['user' => $request->user(), 'gangCrimes'=> $gangCrimes, 'gangMembers' => $gangMembers, 'gangs' => $gangs, 'isBoss' => $boss, 'approvalRequests' => $approvalRequests, 'userBoss' => $userBoss]);
         }
 
-        return view('gang', ['user' => $request->user(), 'gangMembers' => $gangMembers, 'gangs' => $gangs, 'isBoss' => $boss]);
+        return view('gang', ['user' => $request->user(), 'gangCrimes'=> $gangCrimes, 'gangMembers' => $gangMembers, 'gangs' => $gangs, 'isBoss' => $boss]);
     }
 
     public function startGangCrime($crimeId, Request $request){         
