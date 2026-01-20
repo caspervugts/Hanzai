@@ -147,21 +147,31 @@ class ProfileController extends Controller
 
     public function viewGarage(Request $request): View
     {
-        $user = User::find(Auth::user()->id);
-        #$cars = $user->cars;  // Retrieves all cars associated with the user
-        $cars = DB::table('car_user')
-            ->join('cars', 'car_user.car_id', '=', 'cars.id')
-            ->where('car_user.user_id', '=', Auth::user()->id)
-            ->where('car_user.gang_crime_id', '=', null)
-            ->select('cars.*', 'car_user.id as pivot_id', 'car_user.value as value', 'car_user.user_id as user_id', 'car_user.id as car_id')
-            ->get();
+        //check if user is in jail             
+        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
 
-        return view('garage', [
-            'user' => $request->user(), 'cars' => $cars,
-        ]);
+        if(empty($results)){
+            $user = User::find(Auth::user()->id);
+            #$cars = $user->cars;  // Retrieves all cars associated with the user
+            $cars = DB::table('car_user')
+                ->join('cars', 'car_user.car_id', '=', 'cars.id')
+                ->where('car_user.user_id', '=', Auth::user()->id)
+                ->where('car_user.gang_crime_id', '=', null)
+                ->select('cars.*', 'car_user.id as pivot_id', 'car_user.value as value', 'car_user.user_id as user_id', 'car_user.id as car_id')
+                ->get();
+
+            return view('garage', [
+                'user' => $request->user(), 'cars' => $cars,
+            ]);
+        }else{
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
+        }
     }
 
-    public function sellCar(Request $request, $carId, $userId): RedirectResponse
+    public function sellCar(Request $request, $userId, $carId): RedirectResponse
     {    
         
         
@@ -171,22 +181,24 @@ class ProfileController extends Controller
 
         $prefectureTax = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->tax_percentage;
         $prefectureBoss = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->boss_id;
-        #dd($carValue[0]->value);
+        # dd($carValue);
         //$user->cars()->detach($carId);
-
+        
         DB::table('users')->where('id', Auth::user()->id)->increment('money', $carValue[0]->value);
+        if($prefectureBoss != null){
+            if(!$prefectureTax){
+                $prefectureTax = 0;
+            }
+            $bossCut = intval($carValue[0]->value * ($prefectureTax / 100));
 
-        if(!$prefectureTax){
-            $prefectureTax = 0;
-        }
-        $bossCut = intval($carValue[0]->value * ($prefectureTax / 100));
-
-        if($bossCut < 0){
-            $rewardSentence = $carValue[0]->value.' ¥'.   $carValue[0]->value.'.';
+            if($bossCut < 0){
+                $rewardSentence = $carValue[0]->value.' ¥'.   $carValue[0]->value.'.';
+            }else{
+                $rewardSentence = ' ¥'.$carValue[0]->value.' and gave ¥'.$bossCut.' to the prefecture boss.';
+            }
         }else{
-            $rewardSentence = ' ¥'.$carValue[0]->value.' and gave ¥'.$bossCut.' to the prefecture boss.';
+            $rewardSentence = ' ¥'.$carValue[0]->value.'.';
         }
-
         $deleted = DB::table('car_user')->where('id', '=', $carId)->where('user_id', '=', $userId)->delete();
 
         //$cars = $user->cars;  // Retrieves all cars associated with the user
