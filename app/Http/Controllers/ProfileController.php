@@ -80,42 +80,52 @@ class ProfileController extends Controller
      */
     public function view(Request $request): View
     {
-        $user = User::find(Auth::user()->id);
-        $weapons = $user->weapons()->whereNull('storage_id')->get();
+        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
 
-        $previousHits = DB::table('pvp_battle_instance')
-        ->where('completed', 1)
-        ->where('attacker_id', Auth::user()->id)
-        ->orWhere('defender_id', Auth::user()->id)            
-        ->orderBy('id', 'desc')->take(1)->get();
-        #dd($previousHits);
+        if(empty($results)){
+            
+            $user = User::find(Auth::user()->id);
+            $weapons = $user->weapons()->whereNull('storage_id')->get();
 
-        $previousHitsEvents = [];
-        foreach($previousHits as $hit){
-            $events = DB::table('pvp_battle_moves')
-            ->where('battle_instance_id', $hit->id)
-            ->get();
-            $previousHitsEvents[$hit->id] = $events;
-        }
-        #dd($previousHits);
-        
-        $eventDescriptions = [];
-        foreach($previousHitsEvents as $hitId => $events){
-            foreach($events as $event){
-                $eventDetail = PvpItemEvent::where('id', $event->move_event_id)->first();
-                // Store both the event detail and the user who made the move so the view can reference the move_user_id
-                $eventDescriptions[$hitId][] = (object)[
-                    'event_detail' => $eventDetail,
-                    'move_user_id' => $event->move_user_id,
-                    'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
-                    'move_recipient_name' => User::where('id', $event->move_recipient_id)->first()->name,
-                ];
+            $previousHits = DB::table('pvp_battle_instance')
+            ->where('completed', 1)
+            ->where('attacker_id', Auth::user()->id)
+            ->orWhere('defender_id', Auth::user()->id)            
+            ->orderBy('id', 'desc')->take(1)->get();
+            #dd($previousHits);
+
+            $previousHitsEvents = [];
+            foreach($previousHits as $hit){
+                $events = DB::table('pvp_battle_moves')
+                ->where('battle_instance_id', $hit->id)
+                ->get();
+                $previousHitsEvents[$hit->id] = $events;
             }
+            #dd($previousHits);
+            
+            $eventDescriptions = [];
+            foreach($previousHitsEvents as $hitId => $events){
+                foreach($events as $event){
+                    $eventDetail = PvpItemEvent::where('id', $event->move_event_id)->first();
+                    // Store both the event detail and the user who made the move so the view can reference the move_user_id
+                    $eventDescriptions[$hitId][] = (object)[
+                        'event_detail' => $eventDetail,
+                        'move_user_id' => $event->move_user_id,
+                        'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
+                        'move_recipient_name' => User::where('id', $event->move_recipient_id)->first()->name,
+                    ];
+                }
+            }
+            
+            return view('dashboard', [
+                'user' => $request->user(), 'weapons' => $weapons, 'previousHits' => $previousHits, 'previousHitsEvents' => $previousHitsEvents, 'eventDescriptions' => $eventDescriptions
+            ]);
+        }else{
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';  
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
-        
-        return view('dashboard', [
-            'user' => $request->user(), 'weapons' => $weapons, 'previousHits' => $previousHits, 'previousHitsEvents' => $previousHitsEvents, 'eventDescriptions' => $eventDescriptions
-        ]);
     }
     
     public function leaderboard(Request $request): View
@@ -161,7 +171,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function sellCar(Request $request, $carId, $userId): RedirectResponse
+    public function sellCar(Request $request, $userId, $carId): RedirectResponse
     {    
         
         
@@ -171,22 +181,24 @@ class ProfileController extends Controller
 
         $prefectureTax = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->tax_percentage;
         $prefectureBoss = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->boss_id;
-        #dd($carValue[0]->value);
+        # dd($carValue);
         //$user->cars()->detach($carId);
-
+        
         DB::table('users')->where('id', Auth::user()->id)->increment('money', $carValue[0]->value);
+        if($prefectureBoss != null){
+            if(!$prefectureTax){
+                $prefectureTax = 0;
+            }
+            $bossCut = intval($carValue[0]->value * ($prefectureTax / 100));
 
-        if(!$prefectureTax){
-            $prefectureTax = 0;
-        }
-        $bossCut = intval($carValue[0]->value * ($prefectureTax / 100));
-
-        if($bossCut < 0){
-            $rewardSentence = $carValue[0]->value.' ¥'.   $carValue[0]->value.'.';
+            if($bossCut < 0){
+                $rewardSentence = $carValue[0]->value.' ¥'.   $carValue[0]->value.'.';
+            }else{
+                $rewardSentence = ' ¥'.$carValue[0]->value.' and gave ¥'.$bossCut.' to the prefecture boss.';
+            }
         }else{
-            $rewardSentence = ' ¥'.$carValue[0]->value.' and gave ¥'.$bossCut.' to the prefecture boss.';
+            $rewardSentence = ' ¥'.$carValue[0]->value.'.';
         }
-
         $deleted = DB::table('car_user')->where('id', '=', $carId)->where('user_id', '=', $userId)->delete();
 
         //$cars = $user->cars;  // Retrieves all cars associated with the user
