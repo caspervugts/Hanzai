@@ -20,6 +20,7 @@ class CrimeController extends Controller
      */
     public function view(Request $request): View{              
         $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
+        #dd($timeLeft);
 
         if(empty($results)){
             $robbery = DB::table('crimes_robbery')->select('difficulty', 'description')->get();
@@ -65,7 +66,11 @@ class CrimeController extends Controller
 
             return view('crime', ['user' => $request->user(), 'robdata' => $robbery, 'cardata' => $cartheft, 'users' => $allusers, 'currentCity' => $currentCity, 'previousHits' => $previousHits, 'previousHitsEvents' => $previousHitsEvents, 'eventDescriptions' => $eventDescriptions]);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            #dd($finalTime);
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -74,14 +79,30 @@ class CrimeController extends Controller
         $roll = rand(1, 100);
         $reward = rand($crime[0]->min_money, $crime[0]->max_money);
         
-        $rewardSentence = $crime[0]->success.' '.$reward.' yen!';
+        $prefectureTax = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->tax_percentage;
+        $prefectureBoss = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->boss_id;
 
+        if(!$prefectureTax){
+            $prefectureTax = 0;
+        }
+        $bossCut = intval($reward * ($prefectureTax / 100));
+
+        if($prefectureBoss == null){
+            $rewardSentence = $crime[0]->success.' ¥'.$reward.'.';
+        }else{
+            $rewardSentence = $crime[0]->success.' ¥'.$reward.' and gave ¥'.$bossCut.' to the prefecture boss.';
+        }
+        
+        //dd($prefectureTax);
+        #$prefectureBossCut = intval($reward * 0.1);
         //Roll to see if crime is succesfull
         if ($roll < $crime[0]->difficulty){
             DB::table('crimes_performed')->insert([
                 'userid' => Auth::user()->id,
                 'crimeid' => $whichCrime,
-                'cash' => $reward          
+                'cash' => $reward,
+                'prefecture_boss_cut' => $bossCut,
+                'prefecture_boss_id' => $prefectureBoss
             ]);
 
             DB::table('users')
@@ -89,6 +110,11 @@ class CrimeController extends Controller
 
             DB::table('users')
             ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
+
+            if($bossCut > 0){
+                DB::table('users')
+                ->where('id', $prefectureBoss)->increment('money', $bossCut);
+            }
 
             return redirect()->route('crime')->with('success', $rewardSentence);
 
@@ -111,11 +137,11 @@ class CrimeController extends Controller
            
             #return Redirect::route('crime')->withInput(['value' => 'You placed a bet. Good luck!']);
             #return view('jail')->withErrors(['theft' => $crime[0]->failure]);
-            
-            return view('crimeResult', [
-                'cash' => $reward,
-                'rewardSentence' => $crime[0]->failure,
-            ]);
+            return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the robbery and got caught!']);
+            // return view('crimeResult', [
+            //     'cash' => $reward,
+            //     'rewardSentence' => $crime[0]->failure,
+            // ]);
         }
     }
 
@@ -157,10 +183,7 @@ class CrimeController extends Controller
             DB::table('users')
             ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
            
-            return view('crimeResult', [
-                'cash' => $reward,
-                'rewardSentence' => $crime[0]->failure,
-            ]);
+            return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the car theft and got caught!']);
         }
     }
     
@@ -198,7 +221,7 @@ class CrimeController extends Controller
 
     public function performHit(){
         //retrieve battle instance
-        $battleInstance = DB::table('pvp_battle_instance')->where('completed', 0);
+        $battleInstance = DB::table('pvp_battle_instance')->where('completed', 0)->where('battle_starttime', '<=', Carbon::now());
         #dd($battleInstance);
         // if(!$battleInstance){
         //     return redirect()->route('crime')->with('error', 'Hit not found.'); 
@@ -212,8 +235,8 @@ class CrimeController extends Controller
             $defender = User::where('id', $battleInstance->defender_id)->first();
             
             //retrieve inventory items (weapons) for both users
-            $attackerWeapons = $attacker->weapons;
-            $defenderWeapons = $defender->weapons;  
+            $attackerWeapons = $attacker->weapons()->whereNull('storage_id')->get();
+            $defenderWeapons = $defender->weapons()->whereNull('storage_id')->get();  
             #dd($attackerWeapons);
             
             foreach($attackerWeapons as $weapon){

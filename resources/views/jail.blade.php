@@ -18,7 +18,8 @@
                             </ul>
                         </div>
                     @endif
-                    {{ __("You are currently in jail.") }}  
+                    {{ __("You are currently in jail.") }}  <br/>
+                    {{ __("Time left: ") }} <b>{{ $timeLeft }}</b>
                     <br>             
                     <!-- Feedback -->
                     <div id="truncate-feedback" class="mt-2 text-green-600 hidden"></div>

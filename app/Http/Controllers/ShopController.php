@@ -26,7 +26,11 @@ class ShopController extends Controller
 
             return view('shop', ['user' => $request->user(), 'weapons' => $weapons]);
         }else{
-             return view('jail', ['user' => $request->user()]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
@@ -46,10 +50,10 @@ class ShopController extends Controller
                 'ammo_amount' => 100    
             ]);
 
-            return Redirect::route('city')->with(['success' => 'You bought the weapon.']);
+            return Redirect::route('prefecture')->with(['success' => 'You bought the weapon.']);
         }
         else{
-            return Redirect::route('city')->withErrors(['money' => 'You don\'t have enough money to purchase this item.']);
+            return Redirect::route('prefecture')->withErrors(['money' => 'You don\'t have enough money to purchase this item.']);
         }
     }
 
@@ -59,7 +63,7 @@ class ShopController extends Controller
         $food = DB::table('foods')->where('id', $foodId)->first();
 
         if($user->money < $food->value){
-            return Redirect::back()->withErrors(['You do not have enough money to buy this food item.']);
+            return Redirect::route('prefecture')->withErrors(['You do not have enough money to buy this food item.']);
         }
 
         // Deduct money and restore health
@@ -70,6 +74,6 @@ class ShopController extends Controller
         }
         $user->save();
 
-        return Redirect::back()->with('success', 'You have successfully bought '.$food->name.' and restored '.$food->health_restore.' health!');
+        return Redirect::route('prefecture')->with('success', 'You have successfully bought '.$food->name.' and restored '.$food->health_restore.' health!');
     }
 }

@@ -51,9 +51,12 @@ return new class extends Migration
         Schema::create('crimes_performed', function (Blueprint $table) {
             $table->id()->primary();
             $table->string('userid');        
-            $table->integer('crimeid');            
+            $table->integer('crimeid')->nullable();            
+            $table->integer('gangcrimeid')->nullable();             
             $table->integer('cash');
             $table->integer('carid')->nullable();
+            $table->integer('prefecture_boss_cut')->nullable();
+            $table->foreignId('prefecture_boss_id')->nullable();
             $table->timestamp('createdate')->useCurrent();
             $table->timestamp('releasedate')->nullable();
         });

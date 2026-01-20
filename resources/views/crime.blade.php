@@ -79,7 +79,7 @@
                     </div>
                 </div>
             </div>
-
+            @if ($user->exp > 250)
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Schedule a hit -->
                 <div class="bg-white shadow-sm sm:rounded-lg p-6">
@@ -123,7 +123,7 @@
                     @endif
                 </div>
             </div>
-
+            @endif
         </div>
     </div>
 </x-app-layout>
