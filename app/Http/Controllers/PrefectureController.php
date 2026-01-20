@@ -38,8 +38,18 @@ class PrefectureController extends Controller
 
     public function viewTravel(Request $request): View
     {
-        $prefectures = DB::table('prefectures')->get();
-        return view('travel', ['user' => $request->user(), 'prefectures' => $prefectures]);
+        //check if user is in jail             
+        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
+
+        if(empty($results)){
+            $prefectures = DB::table('prefectures')->get();
+            return view('travel', ['user' => $request->user(), 'prefectures' => $prefectures]);
+        }else{
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
+        }
     }
     
     public function claimPrefecture(Request $request, $prefectureId)

@@ -14,13 +14,13 @@ class Horses extends Seeder
     public function run(): void
     {
         DB::table('horses')->insert([
-            'name' => 'Je moeder',
+            'name' => 'Willem de Tweede',
             'odds' => '0.10',
             'color' => 'yellow'    
         ]);
 
         DB::table('horses')->insert([
-            'name' => 'Tonanno',
+            'name' => 'Shojin',
             'odds' => '0.03',
             'color' => 'gray'    
         ]);
@@ -44,20 +44,20 @@ class Horses extends Seeder
         ]);
 
         DB::table('horses')->insert([
-            'name' => 'Brutalist',
+            'name' => 'King Kawaii',
             'odds' => '0.08',
             'color' => 'orange'    
         ]);
 
         DB::table('horses')->insert([
-            'name' => 'Skrrt',
+            'name' => 'Bojack',
             'odds' => '0.10',
             'color' => 'Black'    
         ]);
 
         DB::table('horses')->insert([
             //Hoertjes neersteken en vrouwen dood schoppen in de steeg
-            'name' => 'Divine Kalandra',
+            'name' => 'Dranakyuek',
             'odds' => '0.20',
             'color' => 'green'    
         ]);

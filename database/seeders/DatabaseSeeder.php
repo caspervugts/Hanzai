@@ -18,25 +18,20 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         DB::table('users')->insert([
-            'name' => 'timbino',
+            'name' => 'Timbino',
             'email' => 'time_tim@hotmail.com',
-            'password' => Hash::make('starcraft'),
-            'health' => '100',
-            'exp' => '500000',
-            'money' => '20000000',
-            'gang_exp' => '25000',
-            'gang_id' => '1',
+            'password' => Hash::make('starcraft11'),
+            'health' => '100', 
+            'exp' => '50',
             'prefecture_id' => '1',
         ]);
 
         DB::table('users')->insert([
-            'name' => 'noob',
-            'email' => 'timridderhof@gmail.com',
-            'password' => Hash::make('starcraft'),
+            'name' => 'NoobMaster',
+            'email' => 'noobmaster@gmail.com',
+            'password' => Hash::make('starcraft22'),
             'health' => '100',
             'exp' => '50',
-            'money' => '50000',
-            'gang_id' => '1',
             'prefecture_id' => '1',
         ]);
 
@@ -45,44 +40,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@test.com',
             'password' => Hash::make('welkom01'),
             'health' => '100',
-            'exp' => '500000',
-            'money' => '25000',
-            'gang_id' => '1',
+            'exp' => '50',
             'prefecture_id' => '1',
-        ]);
-        
-        DB::table('gangs')->insert([
-            'name' => 'Admin Gang Gang',
-            'description' => 'De gang van de admins',
-            'gang_money' => '1000000',
-            'total_gang_exp' => '50000',
-            'gang_boss_id' => '1',
-        ]);
-        
-        DB::table('gangs')->insert([
-            'name' => 'Noob Gang',
-            'description' => 'De gang van de noobs',
-            'gang_money' => '10000',
-            'total_gang_exp' => '50000',
-            'gang_boss_id' => '2',
-        ]);
-
-        DB::table('gang_approval')->insert([
-            'user_id' => '1',
-            'gang_id' => '1',
-            'status' => '1'
-        ]);
-
-        DB::table('gang_approval')->insert([
-            'user_id' => '3',
-            'gang_id' => '1',
-            'status' => '1'
-        ]);
-
-        DB::table('gang_approval')->insert([
-            'user_id' => '2',
-            'gang_id' => '2',
-            'status' => '1'
         ]);
 
          DB::table('cities')->insert([
@@ -97,7 +56,7 @@ class DatabaseSeeder extends Seeder
             'failure' => 'You got caught and sent to prison. You\'ll be released in 60 seconds.',
             'success' => 'You were succesful in pickpocketing a tourist. Congrats. You took ',
             'min_money' => '100',
-            'max_money' => '400',
+            'max_money' => '500',
             'exp' => '10',
             'cooldown' => '60'
         ]);
