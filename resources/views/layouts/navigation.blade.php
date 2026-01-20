@@ -24,8 +24,8 @@
                 </div>        
                 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('city')" :active="request()->routeIs('city')">
-                        {{ __('City') }}
+                    <x-nav-link :href="route('prefecture')" :active="request()->routeIs('prefecture')">
+                        {{ __('Prefecture') }}
                     </x-nav-link>
                 </div>  
 
@@ -75,6 +75,9 @@
                         </x-dropdown-link>
                         <x-dropdown-link :href="route('combatlog')">
                             {{ __('Combat Log') }}
+                        </x-dropdown-link>
+                        <x-dropdown-link :href="route('travel')">
+                            {{ __('Travel') }}
                         </x-dropdown-link>
                         <x-dropdown-link :href="route('help')">
                             {{ __('Help / FAQ') }}
@@ -135,8 +138,8 @@
                         {{ __('Crime') }}
                     </x-responsive-nav-link>
                                
-                    <x-responsive-nav-link :href="route('city')" :active="request()->routeIs('city')">
-                            {{ __('City') }}    
+                    <x-responsive-nav-link :href="route('prefecture')" :active="request()->routeIs('prefecture')">
+                            {{ __('Prefecture') }}    
                     </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('garage')" :active="request()->routeIs('garage')">

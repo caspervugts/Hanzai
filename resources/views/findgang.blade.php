@@ -9,7 +9,11 @@
             {{ __('Find a gang') }}
         </h2>
     </x-slot>
-
+    @if ($user->exp < 250)
+        <div class="bg-red-50 border border-red-200 text-red-800 rounded-md p-4">
+            {{ __('You need at least 250 experience to join a gang.') }}
+        </div>
+    @else
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -78,5 +82,6 @@
             </div>
         </div>        
     </div>
+    @endif
 </x-app-layout>
                     

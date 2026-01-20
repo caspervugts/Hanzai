@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('difficulty');
             $table->integer('min_money');
             $table->integer('max_money');
-            $table->integer('performance');
+            $table->integer('performance');            
         });
 
         Schema::create('car_user', function (Blueprint $table) {
@@ -26,6 +26,8 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->foreignId('car_id');
             $table->integer('value');
+            $table->foreignId('storage_id')->nullable();
+            $table->foreignId('gang_crime_id')->nullable();
             $table->timestamp('createdate')->useCurrent();
         });
     }

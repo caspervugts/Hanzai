@@ -6,7 +6,7 @@
     @endif
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('City') }} - {{ $currentCity->name }} 
+            {{ __('Prefecture') }} - {{ $currentPrefecture->name }} 
         </h2>
     </x-slot>
 <div class="py-12">
@@ -76,7 +76,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 
                 <div class="p-6 text-gray-900">
-                    {{ __("All city inhabitants") }}   
+                    {{ __("All prefecture inhabitants") }}   
                               @foreach($users as $user)
                                   <div>
                                       <strong>{{ $user->name }}</strong>
@@ -86,4 +86,24 @@
                 </div>               
             </div>
     </div>
+    
+    <br/>
+    @if ($currentPrefecture->boss_id  == null)
+   <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                
+                <div class="p-6 text-gray-900">
+                    {{ __("This prefecture has no boss currently.") }}  <br/>
+                    {{ __("Would you like to claim it for ") }} ¥{{ number_format($currentPrefecture->investment_cost) }}? <br/><br/>
+                    <a href="/prefecture/claim/{{ $currentPrefecture->id }}">
+                        <button class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            {{ __("Purchase control for ") }} ¥{{ number_format($currentPrefecture->investment_cost) }}
+                        </button>
+                    </a>
+                                                 
+                </div>               
+            </div>
+    </div>
+    @endif
+</div>
 </x-app-layout>
