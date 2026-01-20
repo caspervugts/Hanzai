@@ -27,7 +27,7 @@ class Cars extends Seeder
             'description' => 'Renault Twingo',
             'difficulty' => '1',
             'min_money' => '2000',
-            'max_money' => '3000',
+            'max_money' => '4000',
             'performance' => '10'
         ]);
 
@@ -36,7 +36,7 @@ class Cars extends Seeder
             'description' => 'Fiat Punto',
             'difficulty' => '1',
             'min_money' => '500',
-            'max_money' => '3500',
+            'max_money' => '4500',
             'performance' => '10'
         ]);
 
@@ -45,7 +45,7 @@ class Cars extends Seeder
             'description' => 'BMW Series 3',
             'difficulty' => '2',
             'min_money' => '2500',
-            'max_money' => '7500',
+            'max_money' => '10500',
             'performance' => '20'
         ]);
 
@@ -54,7 +54,7 @@ class Cars extends Seeder
             'description' => 'Suzuki Swift',
             'difficulty' => '2',
             'min_money' => '4000',
-            'max_money' => '5000',
+            'max_money' => '8000',
             'performance' => '20'
         ]);
 
@@ -63,7 +63,7 @@ class Cars extends Seeder
             'description' => 'Mazda 3',
             'difficulty' => '2',
             'min_money' => '5000',
-            'max_money' => '7000',
+            'max_money' => '12000',
             'performance' => '20'
         ]);
 
@@ -72,7 +72,7 @@ class Cars extends Seeder
             'description' => 'Volvo s40',
             'difficulty' => '3',
             'min_money' => '5000',
-            'max_money' => '12000',
+            'max_money' => '20000',
             'performance' => '10'
         ]);
 
@@ -81,7 +81,7 @@ class Cars extends Seeder
             'description' => 'Mercedes C-Class',
             'difficulty' => '3',
             'min_money' => '8000',
-            'max_money' => '15000',
+            'max_money' => '35000',
             'performance' => '30'
         ]);
 
@@ -90,7 +90,7 @@ class Cars extends Seeder
             'description' => 'Nissan GT-R',
             'difficulty' => '3',
             'min_money' => '10000',
-            'max_money' => '20000',
+            'max_money' => '40000',
             'performance' => '30'
         ]);
 
@@ -99,7 +99,7 @@ class Cars extends Seeder
             'description' => 'BMW i8',
             'difficulty' => '4',
             'min_money' => '40000',
-            'max_money' => '60000',
+            'max_money' => '80000',
             'performance' => '40'
         ]);
 
@@ -108,7 +108,7 @@ class Cars extends Seeder
             'description' => 'Porsche 911 Turbo S',
             'difficulty' => '4',
             'min_money' => '25000',
-            'max_money' => '80000',
+            'max_money' => '100000',
             'performance' => '40'
         ]);
 
@@ -117,7 +117,7 @@ class Cars extends Seeder
             'description' => 'Jaguar F-Type',
             'difficulty' => '4',
             'min_money' => '35000',
-            'max_money' => '70000',
+            'max_money' => '120000',
             'performance' => '40'
         ]);
     }
