@@ -80,52 +80,42 @@ class ProfileController extends Controller
      */
     public function view(Request $request): View
     {
-        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
+        $user = User::find(Auth::user()->id);
+        $weapons = $user->weapons()->whereNull('storage_id')->get();
 
-        if(empty($results)){
-            
-            $user = User::find(Auth::user()->id);
-            $weapons = $user->weapons()->whereNull('storage_id')->get();
+        $previousHits = DB::table('pvp_battle_instance')
+        ->where('completed', 1)
+        ->where('attacker_id', Auth::user()->id)
+        ->orWhere('defender_id', Auth::user()->id)            
+        ->orderBy('id', 'desc')->take(1)->get();
+        #dd($previousHits);
 
-            $previousHits = DB::table('pvp_battle_instance')
-            ->where('completed', 1)
-            ->where('attacker_id', Auth::user()->id)
-            ->orWhere('defender_id', Auth::user()->id)            
-            ->orderBy('id', 'desc')->take(1)->get();
-            #dd($previousHits);
-
-            $previousHitsEvents = [];
-            foreach($previousHits as $hit){
-                $events = DB::table('pvp_battle_moves')
-                ->where('battle_instance_id', $hit->id)
-                ->get();
-                $previousHitsEvents[$hit->id] = $events;
-            }
-            #dd($previousHits);
-            
-            $eventDescriptions = [];
-            foreach($previousHitsEvents as $hitId => $events){
-                foreach($events as $event){
-                    $eventDetail = PvpItemEvent::where('id', $event->move_event_id)->first();
-                    // Store both the event detail and the user who made the move so the view can reference the move_user_id
-                    $eventDescriptions[$hitId][] = (object)[
-                        'event_detail' => $eventDetail,
-                        'move_user_id' => $event->move_user_id,
-                        'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
-                        'move_recipient_name' => User::where('id', $event->move_recipient_id)->first()->name,
-                    ];
-                }
-            }
-            
-            return view('dashboard', [
-                'user' => $request->user(), 'weapons' => $weapons, 'previousHits' => $previousHits, 'previousHitsEvents' => $previousHitsEvents, 'eventDescriptions' => $eventDescriptions
-            ]);
-        }else{
-            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
-            $timeLeft = substr($timeLeft, 1, 25);
-            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';  
-            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
+        $previousHitsEvents = [];
+        foreach($previousHits as $hit){
+            $events = DB::table('pvp_battle_moves')
+            ->where('battle_instance_id', $hit->id)
+            ->get();
+            $previousHitsEvents[$hit->id] = $events;
         }
+        #dd($previousHits);
+        
+        $eventDescriptions = [];
+        foreach($previousHitsEvents as $hitId => $events){
+            foreach($events as $event){
+                $eventDetail = PvpItemEvent::where('id', $event->move_event_id)->first();
+                // Store both the event detail and the user who made the move so the view can reference the move_user_id
+                $eventDescriptions[$hitId][] = (object)[
+                    'event_detail' => $eventDetail,
+                    'move_user_id' => $event->move_user_id,
+                    'move_user_name' => User::where('id', $event->move_user_id)->first()->name,
+                    'move_recipient_name' => User::where('id', $event->move_recipient_id)->first()->name,
+                ];
+            }
+        }
+        
+        return view('dashboard', [
+            'user' => $request->user(), 'weapons' => $weapons, 'previousHits' => $previousHits, 'previousHitsEvents' => $previousHitsEvents, 'eventDescriptions' => $eventDescriptions
+        ]);
     }
     
     public function leaderboard(Request $request): View
@@ -157,18 +147,28 @@ class ProfileController extends Controller
 
     public function viewGarage(Request $request): View
     {
-        $user = User::find(Auth::user()->id);
-        #$cars = $user->cars;  // Retrieves all cars associated with the user
-        $cars = DB::table('car_user')
-            ->join('cars', 'car_user.car_id', '=', 'cars.id')
-            ->where('car_user.user_id', '=', Auth::user()->id)
-            ->where('car_user.gang_crime_id', '=', null)
-            ->select('cars.*', 'car_user.id as pivot_id', 'car_user.value as value', 'car_user.user_id as user_id', 'car_user.id as car_id')
-            ->get();
+        //check if user is in jail             
+        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
 
-        return view('garage', [
-            'user' => $request->user(), 'cars' => $cars,
-        ]);
+        if(empty($results)){
+            $user = User::find(Auth::user()->id);
+            #$cars = $user->cars;  // Retrieves all cars associated with the user
+            $cars = DB::table('car_user')
+                ->join('cars', 'car_user.car_id', '=', 'cars.id')
+                ->where('car_user.user_id', '=', Auth::user()->id)
+                ->where('car_user.gang_crime_id', '=', null)
+                ->select('cars.*', 'car_user.id as pivot_id', 'car_user.value as value', 'car_user.user_id as user_id', 'car_user.id as car_id')
+                ->get();
+
+            return view('garage', [
+                'user' => $request->user(), 'cars' => $cars,
+            ]);
+        }else{
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
+        }
     }
 
     public function sellCar(Request $request, $userId, $carId): RedirectResponse
