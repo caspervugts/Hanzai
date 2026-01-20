@@ -152,7 +152,7 @@ class ProfileController extends Controller
         $cars = DB::table('car_user')
             ->join('cars', 'car_user.car_id', '=', 'cars.id')
             ->where('car_user.user_id', '=', Auth::user()->id)
-            ->where('car_user.gang_crime_id', '==', null)
+            ->where('car_user.gang_crime_id', '=', null)
             ->select('cars.*', 'car_user.id as pivot_id', 'car_user.value as value', 'car_user.user_id as user_id', 'car_user.id as car_id')
             ->get();
 
