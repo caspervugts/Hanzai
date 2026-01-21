@@ -18,23 +18,19 @@
                 <!-- Input + chat type toggle -->
                 <div id="chat-input-container" class="border-t p-2 bg-white flex flex-col space-y-2">
 
-                    <!-- Slide toggle -->
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm">All</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <!-- De checkbox zelf -->
-                            <input type="checkbox" id="chat-type-toggle" class="sr-only peer">
-                            
-                            <!-- De achtergrond van de toggle -->
-                            <div class="w-12 h-6 bg-gray-300 rounded-full peer-focus:ring-2 peer-focus:ring-red-500 
-                                        peer-checked:bg-red-500 transition-colors duration-200"></div>
-                            
-                            <!-- Het schuivende bolletje -->
-                            <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-md 
-                                        transform peer-checked:translate-x-6 transition-transform duration-200"></div>
-                        </label>
-                        <span class="text-sm">Gang</span>
-                    </div>
+                    @if(auth()->user()?->gang_id)
+                        <!-- Slide toggle -->
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm">All</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="chat-type-toggle" class="sr-only peer">
+                                <div class="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-red-500 transition"></div>
+                                <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full 
+                                            transform peer-checked:translate-x-6 transition"></div>
+                            </label>
+                            <span class="text-sm">Gang</span>
+                        </div>
+                    @endif
 
                     <!-- Input + button -->
                     <div class="flex">
@@ -49,7 +45,16 @@
         </div>
     </div>
 </div>
-
+<style>
+    @keyframes blink {
+        0%, 100% { background-color: #1f2937; } /* gray-800 */
+        50% { background-color: #b91c1c; }      /* red-700 */
+    }
+    
+    .chat-blink {
+        animation: blink 1s infinite;
+    }
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const chatRoom = document.getElementById('chat-room');
@@ -58,6 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('chat-send');
     const inputContainer = document.getElementById('chat-input-container');
     const minimizeBtn = document.getElementById('chat-minimize');
+    const header = document.getElementById('chat-room-header');
+    let lastMessageCount = 0;
+    let unreadCount = 0;
+    const headerTitle = header.querySelector('span');
+
 
     // Simple cookie helpers
     function setCookie(name, value, days = 365) {
@@ -73,6 +83,29 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
+    function openChat() {
+        minimized = false;
+        setCookie('chat_minimized', 'false');
+
+        // stop eventuele notificatie-states later
+        const header = document.getElementById('chat-room-header');
+        header.classList.remove('animate-pulse');
+
+        updateChatState();
+
+        // netjes naar beneden scrollen
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    header.addEventListener('click', (e) => {
+        // voorkom dubbele toggle als je op de knop klikt
+        if (e.target === minimizeBtn) return;
+
+        if (minimized) {
+            openChat();
+        }
+    });
+
     // Init state van cookie
     let minimized = getCookie('chat_minimized') === 'true';
 
@@ -82,13 +115,20 @@ document.addEventListener('DOMContentLoaded', () => {
             chatRoom.classList.add('h-11');
             messagesDiv.classList.add('hidden');
             inputContainer.classList.add('hidden');
-            minimizeBtn.innerHTML = '&#9660;'; // pijltje naar beneden
+            minimizeBtn.innerHTML = '&#9660;';
         } else {
             chatRoom.classList.remove('h-11');
             chatRoom.classList.add('h-96');
             messagesDiv.classList.remove('hidden');
             inputContainer.classList.remove('hidden');
-            minimizeBtn.innerHTML = '&#9650;'; // pijltje omhoog
+            minimizeBtn.innerHTML = '&#9650;';
+
+            // RESET unread
+            unreadCount = 0;
+            header.classList.remove('chat-blink');
+            headerTitle.textContent = 'Chat';
+
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
     }
 
@@ -96,17 +136,27 @@ document.addEventListener('DOMContentLoaded', () => {
     updateChatState();
 
     // Toggle minimaliseer
-    minimizeBtn.addEventListener('click', () => {
+    minimizeBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // voorkomt header-click
+
         minimized = !minimized;
-        setCookie('chat_minimized', minimized);
+        setCookie('chat_minimized', minimized ? 'true' : 'false');
         updateChatState();
     });
+
+    function isNearBottom() {
+        const threshold = 40; // px
+        return messagesDiv.scrollTop + messagesDiv.clientHeight >= messagesDiv.scrollHeight - threshold;
+    }
 
     // Fetch messages
     async function fetchMessages() {
         try {
             const res = await fetch('/chat/messages');
             const data = await res.json();
+            const newMessages = data.length - lastMessageCount;
+            const shouldScroll = !minimized && isNearBottom();
+
             messagesDiv.innerHTML = data.map(m => {
                 const typename = (m.chat_type === 'gang') ? `${m.user.gang.name}` : 'All';
                 const color = (m.chat_type === 'gang') ? '#BC002D' : 'black';
@@ -118,28 +168,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
             }).join('');
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            if (newMessages > 0 && minimized) {
+                unreadCount += newMessages;
+                header.classList.add('chat-blink');
+                headerTitle.textContent = `Chat (${unreadCount})`;
+            }
+
+            lastMessageCount = data.length;
+            
+            if (shouldScroll) {
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
         } catch (err) {
             console.error('Error fetching messages', err);
         }
     }
 
-    fetchMessages();
+    fetchMessages().then(() => {
+        lastMessageCount = messagesDiv.children.length;
+    });
     setInterval(fetchMessages, 3000);
 
     async function sendMessage() {
-        const chatType = document.getElementById('chat-type-toggle').checked ? 'gang' : 'all';
-        const message = input.value.trim();
+        const toggle = document.getElementById('chat-type-toggle');
+        const chatType = toggle && toggle.checked ? 'gang' : 'all';
 
+        const message = input.value.trim();
         if (!message) return;
+
         await fetch('/chat/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({ 
-                message: input.value, 
+            body: JSON.stringify({
+                message: message,
                 chat_type: chatType,
             })
         });
@@ -147,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.value = '';
         fetchMessages();
     }
+
 
     input.addEventListener('keypress', e => {
         if (e.key === 'Enter') {
