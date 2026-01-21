@@ -237,18 +237,25 @@ class GangController extends Controller
         $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
 
         if(empty($results)){
-            $gangMembers = $request->input('gang_members');
-            $gangCars = $request->input('gang_cars');
-            $gangWeapons = $request->input('gang_weapons');
+            $gangMembers = $request->input('gang_members', []);
+            $gangCars = $request->input('gang_cars', []);
+            $gangWeapons = $request->input('gang_weapons', []);
             $crimeId = $request->input('crime_id');
 
             #dd($gangMembers, $gangCars, $gangWeapons, $crimeId);
 
             $crimeDetails = DB::table('crimes_gang')->where('id', $crimeId)->first();
-            $weaponCount = count($gangWeapons);
-            $carCount = count($gangCars);  
+            
+            if(!$crimeDetails){
+                return Redirect::back()->withErrors(['gangcrime' => 'Crime not found.']);
+            }
+            
+            $weaponCount = is_array($gangWeapons) ? count($gangWeapons) : 0;
+            $carCount = is_array($gangCars) ? count($gangCars) : 0;
+            $memberCount = is_array($gangMembers) ? count($gangMembers) : 0;
+            
             #dd($weaponCount, $carCount);
-            if(count($gangMembers) + 1 < $crimeDetails->required_gang_size){                
+            if($memberCount + 1 < $crimeDetails->required_gang_size){                
                 return Redirect::back()->withErrors(['gangcrime' => 'Not enough gang members selected for this crime. Minimum required: '.$crimeDetails->required_gang_size]);
             }
 
