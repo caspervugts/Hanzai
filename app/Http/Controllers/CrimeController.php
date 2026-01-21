@@ -100,7 +100,7 @@ class CrimeController extends Controller
             //dd($prefectureTax);
             #$prefectureBossCut = intval($reward * 0.1);
             //Roll to see if crime is succesfull
-            if ($roll < $crime[0]->difficulty){
+            if ($roll < ($crime[0]->difficulty + (Auth::user()->exp/10))){
                 DB::table('crimes_performed')->insert([
                     'userid' => Auth::user()->id,
                     'crimeid' => $whichCrime,
@@ -164,7 +164,7 @@ class CrimeController extends Controller
             $crime = DB::table('crimes_cartheft')->select('difficulty','cooldown','exp','failure','success')->where('id', '=', $whichCrime)->get();
             $roll = rand(1, 100);
 
-            if ($roll < $crime[0]->difficulty){
+            if ($roll < ($crime[0]->difficulty + (Auth::user()->exp/40))){
                 $reward = DB::table('cars')->select('id','description','min_money','max_money')->where('difficulty', '=', $whichCrime)->inRandomOrder()->limit(1)->get();  
                 #dd($reward);
                 $rewardSentence = $crime[0]->success.' '.$reward[0]->description.'!';

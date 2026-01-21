@@ -273,13 +273,16 @@ class GangController extends Controller
                 'completed' => 0             
             ]);
 
-            foreach($gangMembers as $member){
-                DB::table('crimes_gang_invites')->insert([
-                    'user_id' => $member,
-                    'gang_crime_id' => $gangCrimePerformedId,  
-                    'accepted' => 0,  
-                    'completed' => 0               
-                ]);
+            // Only process gang members if array is not empty
+            if(!empty($gangMembers) && is_array($gangMembers)){
+                foreach($gangMembers as $member){
+                    DB::table('crimes_gang_invites')->insert([
+                        'user_id' => $member,
+                        'gang_crime_id' => $gangCrimePerformedId,  
+                        'accepted' => 0,  
+                        'completed' => 0               
+                    ]);
+                }
             }
 
             //insert thyself
@@ -290,26 +293,32 @@ class GangController extends Controller
                 'completed' => 0               
             ]);
 
-            foreach($gangCars as $car){
-                $carStorageId = DB::table('crimes_gang_storage')->insertGetId([
-                    'user_id' => Auth::user()->id,
-                    'gang_crime_id' => $gangCrimePerformedId,  
-                    'car_id' => $car,
-                    'weapon_id' => null              
-                ]);
+            // Only process cars if array is not empty
+            if(!empty($gangCars) && is_array($gangCars)){
+                foreach($gangCars as $car){
+                    $carStorageId = DB::table('crimes_gang_storage')->insertGetId([
+                        'user_id' => Auth::user()->id,
+                        'gang_crime_id' => $gangCrimePerformedId,  
+                        'car_id' => $car,
+                        'weapon_id' => null              
+                    ]);
 
-                DB::table('car_user')->where('user_id', Auth::user()->id)->where('car_id', $car)->update(['storage_id' => $carStorageId, 'gang_crime_id' => $gangCrimePerformedId]);
-            }   
+                    DB::table('car_user')->where('user_id', Auth::user()->id)->where('car_id', $car)->update(['storage_id' => $carStorageId, 'gang_crime_id' => $gangCrimePerformedId]);
+                }
+            }
 
-            foreach($gangWeapons as $weapon){
-                $weaponStorageId = DB::table('crimes_gang_storage')->insertGetId([
-                    'user_id' => Auth::user()->id,
-                    'gang_crime_id' => $gangCrimePerformedId,  
-                    'car_id' => null,
-                    'weapon_id' => $weapon              
-                ]);
+            // Only process weapons if array is not empty
+            if(!empty($gangWeapons) && is_array($gangWeapons)){
+                foreach($gangWeapons as $weapon){
+                    $weaponStorageId = DB::table('crimes_gang_storage')->insertGetId([
+                        'user_id' => Auth::user()->id,
+                        'gang_crime_id' => $gangCrimePerformedId,  
+                        'car_id' => null,
+                        'weapon_id' => $weapon              
+                    ]);
 
-                DB::table('user_weapon')->where('user_id', Auth::user()->id)->where('weapon_id', $weapon)->update(['storage_id' => $weaponStorageId, 'gang_crime_id' => $gangCrimePerformedId]);
+                    DB::table('user_weapon')->where('user_id', Auth::user()->id)->where('weapon_id', $weapon)->update(['storage_id' => $weaponStorageId, 'gang_crime_id' => $gangCrimePerformedId]);
+                }
             }
 
              DB::table('users')->where('id', Auth::user()->id)->decrement('money', $crimeDetails->required_money);
