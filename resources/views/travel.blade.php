@@ -44,7 +44,13 @@
                     <B>{{ __("Available Prefectures to Travel") }}   </b>
                               @foreach($prefectures as $prefecture)
                                   <div>
-                                      <strong>{{ $prefecture->name }}</strong> <br/> {{ $prefecture->description }} <br/> Travel Cost: ¥{{ number_format($prefecture->travel_cost) }} 
+                                      <strong>{{ $prefecture->name }}</strong> <br/> {{ $prefecture->description }} - Tax {{ $prefecture->tax_percentage }}% <br/> 
+                                      @if($prefecture->boss_name)
+                                          Controlled by: <strong>{{ $prefecture->boss_name }}</strong><br/>
+                                      @else
+                                          <span class="text-gray-500">Unclaimed</span><br/>
+                                      @endif
+                                      Travel Cost: ¥{{ number_format($prefecture->travel_cost) }} 
                                       <a href="/prefecture/travel/{{ $prefecture->id }}"><button class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
                             {{  "Travel" }}
                         </button></a>
