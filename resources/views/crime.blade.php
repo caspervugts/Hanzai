@@ -51,7 +51,7 @@
                             <div class="flex items-start justify-between border rounded p-3">
                                 <div>
                                     <div class="font-medium">{{ $r->description }}</div>
-                                    <div class="text-sm text-gray-500">{{ __('Difficulty') }}: {{ $r->difficulty }}%</div>
+                                    <div class="text-sm text-gray-500">{{ __('Difficulty') }}: {{ $r->difficulty + (Auth::user()->exp/10) }}%</div>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <a href="/crime/1/{{ $index + 1 }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ __('Attempt') }}</a>
@@ -69,7 +69,7 @@
                             <div class="flex items-start justify-between border rounded p-3">
                                 <div>
                                     <div class="font-medium">{{ $c->description }}</div>
-                                    <div class="text-sm text-gray-500">{{ __('Difficulty') }}: {{ $c->difficulty }}%</div>
+                                    <div class="text-sm text-gray-500">{{ __('Difficulty') }}: {{ $c->difficulty + (Auth::user()->exp/40) }}%</div>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <a href="/crime/2/{{ $index + 1 }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ __('Attempt') }}</a>

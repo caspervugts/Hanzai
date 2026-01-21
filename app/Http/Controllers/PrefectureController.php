@@ -42,7 +42,10 @@ class PrefectureController extends Controller
         $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
 
         if(empty($results)){
-            $prefectures = DB::table('prefectures')->get();
+            $prefectures = DB::table('prefectures')
+                ->leftJoin('users', 'prefectures.boss_id', '=', 'users.id')
+                ->select('prefectures.*', 'users.name as boss_name')
+                ->get();
             return view('travel', ['user' => $request->user(), 'prefectures' => $prefectures]);
         }else{
             $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
