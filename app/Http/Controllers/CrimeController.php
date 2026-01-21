@@ -75,115 +75,137 @@ class CrimeController extends Controller
     }
 
     public function performRobbery($whichCrime, Request $request){
-        $crime = DB::table('crimes_robbery')->select('difficulty','min_money','max_money','cooldown','exp','failure','success')->where('id', '=', $whichCrime)->get();
-        $roll = rand(1, 100);
-        $reward = rand($crime[0]->min_money, $crime[0]->max_money);
-        
-        $prefectureTax = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->tax_percentage;
-        $prefectureBoss = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->boss_id;
+        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
+        #dd($timeLeft);
 
-        if(!$prefectureTax){
-            $prefectureTax = 0;
-        }
-        $bossCut = intval($reward * ($prefectureTax / 100));
+        if(empty($results)){
+            $crime = DB::table('crimes_robbery')->select('difficulty','min_money','max_money','cooldown','exp','failure','success')->where('id', '=', $whichCrime)->get();
+            $roll = rand(1, 100);
+            $reward = rand($crime[0]->min_money, $crime[0]->max_money);
+            
+            $prefectureTax = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->tax_percentage;
+            $prefectureBoss = DB::table('prefectures')->where('id', Auth::user()->prefecture_id)->first()->boss_id;
 
-        if($prefectureBoss == null){
-            $rewardSentence = $crime[0]->success.' ¥'.$reward.'.';
-        }else{
-            $rewardSentence = $crime[0]->success.' ¥'.$reward.' and gave ¥'.$bossCut.' to the prefecture boss.';
-        }
-        
-        //dd($prefectureTax);
-        #$prefectureBossCut = intval($reward * 0.1);
-        //Roll to see if crime is succesfull
-        if ($roll < $crime[0]->difficulty){
-            DB::table('crimes_performed')->insert([
-                'userid' => Auth::user()->id,
-                'crimeid' => $whichCrime,
-                'cash' => $reward,
-                'prefecture_boss_cut' => $bossCut,
-                'prefecture_boss_id' => $prefectureBoss
-            ]);
-
-            DB::table('users')
-            ->where('id', Auth::user()->id)->increment('money', $reward);
-
-            DB::table('users')
-            ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
-
-            if($bossCut > 0){
-                DB::table('users')
-                ->where('id', $prefectureBoss)->increment('money', $bossCut);
+            if(!$prefectureTax){
+                $prefectureTax = 0;
             }
+            $bossCut = intval($reward * ($prefectureTax / 100));
 
-            return redirect()->route('crime')->with('success', $rewardSentence);
+            if($prefectureBoss == null){
+                $rewardSentence = $crime[0]->success.' ¥'.$reward.'.';
+            }else{
+                $rewardSentence = $crime[0]->success.' ¥'.$reward.' and gave ¥'.$bossCut.' to the prefecture boss.';
+            }
+            
+            //dd($prefectureTax);
+            #$prefectureBossCut = intval($reward * 0.1);
+            //Roll to see if crime is succesfull
+            if ($roll < $crime[0]->difficulty){
+                DB::table('crimes_performed')->insert([
+                    'userid' => Auth::user()->id,
+                    'crimeid' => $whichCrime,
+                    'cash' => $reward,
+                    'prefecture_boss_cut' => $bossCut,
+                    'prefecture_boss_id' => $prefectureBoss
+                ]);
 
-            // return view('crimeResult', [
-            //     'cash' => $reward,
-            //     'rewardSentence' => $rewardSentence,
-            // ]);
+                DB::table('users')
+                ->where('id', Auth::user()->id)->increment('money', $reward);
+
+                DB::table('users')
+                ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
+
+                if($bossCut > 0){
+                    DB::table('users')
+                    ->where('id', $prefectureBoss)->increment('money', $bossCut);
+                }
+
+                return redirect()->route('crime')->with('success', $rewardSentence);
+
+                // return view('crimeResult', [
+                //     'cash' => $reward,
+                //     'rewardSentence' => $rewardSentence,
+                // ]);
+            }else{
+                $releaseDate =  Carbon::now()->addSeconds($crime[0]->cooldown);
+                DB::table('crimes_performed')->insert([
+                    'userid' => Auth::user()->id,
+                    'crimeid' => $whichCrime,
+                    'cash' => 0,
+                    'releasedate' => $releaseDate            
+                ]);
+
+                $reward = 0;
+                DB::table('users')
+                ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
+            
+                #return Redirect::route('crime')->withInput(['value' => 'You placed a bet. Good luck!']);
+                #return view('jail')->withErrors(['theft' => $crime[0]->failure]);
+                return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the robbery and got caught!']);
+                // return view('crimeResult', [
+                //     'cash' => $reward,
+                //     'rewardSentence' => $crime[0]->failure,
+                // ]);
+            }
         }else{
-            $releaseDate =  Carbon::now()->addSeconds($crime[0]->cooldown);
-            DB::table('crimes_performed')->insert([
-                'userid' => Auth::user()->id,
-                'crimeid' => $whichCrime,
-                'cash' => 0,
-                'releasedate' => $releaseDate            
-            ]);
-
-            $reward = 0;
-            DB::table('users')
-            ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
-           
-            #return Redirect::route('crime')->withInput(['value' => 'You placed a bet. Good luck!']);
-            #return view('jail')->withErrors(['theft' => $crime[0]->failure]);
-            return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the robbery and got caught!']);
-            // return view('crimeResult', [
-            //     'cash' => $reward,
-            //     'rewardSentence' => $crime[0]->failure,
-            // ]);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            #dd($finalTime);
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
 
     public function performCarTheft($whichCrime, Request $request){
-        $crime = DB::table('crimes_cartheft')->select('difficulty','cooldown','exp','failure','success')->where('id', '=', $whichCrime)->get();
-        $roll = rand(1, 100);
+        $results = DB::select("SELECT * FROM crimes_performed WHERE userid = ".Auth::user()->id." and releasedate > now()");
+        #dd($timeLeft);
 
-        if ($roll < $crime[0]->difficulty){
-            $reward = DB::table('cars')->select('id','description','min_money','max_money')->where('difficulty', '=', $whichCrime)->inRandomOrder()->limit(1)->get();  
-            #dd($reward);
-            $rewardSentence = $crime[0]->success.' '.$reward[0]->description.'!';
-            $carValue = rand($reward[0]->min_money, $reward[0]->max_money);
+        if(empty($results)){
+            $crime = DB::table('crimes_cartheft')->select('difficulty','cooldown','exp','failure','success')->where('id', '=', $whichCrime)->get();
+            $roll = rand(1, 100);
 
-            $user = User::find(Auth::user()->id);            
-            $user->cars()->attach($reward[0]->id, ['value' => $carValue]);
+            if ($roll < $crime[0]->difficulty){
+                $reward = DB::table('cars')->select('id','description','min_money','max_money')->where('difficulty', '=', $whichCrime)->inRandomOrder()->limit(1)->get();  
+                #dd($reward);
+                $rewardSentence = $crime[0]->success.' '.$reward[0]->description.'!';
+                $carValue = rand($reward[0]->min_money, $reward[0]->max_money);
 
-            $rewardSentence = $crime[0]->success.' '.$reward[0]->description.' worth '.$carValue.' yen! The car is added to your garage.';
+                $user = User::find(Auth::user()->id);            
+                $user->cars()->attach($reward[0]->id, ['value' => $carValue]);
 
-            DB::table('users')
-            ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
+                $rewardSentence = $crime[0]->success.' '.$reward[0]->description.' worth '.$carValue.' yen! The car is added to your garage.';
+
+                DB::table('users')
+                ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
+                
+                return redirect()->route('crime')->with('success', $rewardSentence);
+
+                // return view('crimeResult', [
+                //     'cash' => $carValue,
+                //     'rewardSentence' => $rewardSentence,
+                // ]);
+
+            }else{
+                $releaseDate =  Carbon::now()->addSeconds($crime[0]->cooldown);
+                DB::table('crimes_performed')->insert([
+                    'userid' => Auth::user()->id,
+                    'crimeid' => $whichCrime,
+                    'cash' => 0,
+                    'releasedate' => $releaseDate            
+                ]);
+
+                $reward = 0;
+                DB::table('users')
+                ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
             
-            return redirect()->route('crime')->with('success', $rewardSentence);
-
-            // return view('crimeResult', [
-            //     'cash' => $carValue,
-            //     'rewardSentence' => $rewardSentence,
-            // ]);
-
+                return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the car theft and got caught!']);
+            }
         }else{
-            $releaseDate =  Carbon::now()->addSeconds($crime[0]->cooldown);
-            DB::table('crimes_performed')->insert([
-                'userid' => Auth::user()->id,
-                'crimeid' => $whichCrime,
-                'cash' => 0,
-                'releasedate' => $releaseDate            
-            ]);
-
-            $reward = 0;
-            DB::table('users')
-            ->where('id', Auth::user()->id)->increment('exp', $crime[0]->exp);
-           
-            return redirect()->route('crime')->withErrors(['error' => 'You failed to commit the car theft and got caught!']);
+            $timeLeft = Carbon::parse($results[0]->releasedate)->diffInSeconds(Carbon::now());
+            $timeLeft = substr($timeLeft, 1, 25);
+            $finalTime = substr($timeLeft / 60, 0, 2).' minutes and '.($timeLeft % 60).' seconds';
+            #dd($finalTime);
+            return view('jail', ['user' => $request->user(), 'timeLeft' => $finalTime]);
         }
     }
     
