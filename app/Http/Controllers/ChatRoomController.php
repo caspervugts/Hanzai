@@ -47,6 +47,12 @@ class ChatRoomController extends Controller
             'message' => 'required|string|max:500',
         ]);
 
+        $chatType = $request->chat_type === 'gang' ? 'gang' : 'all';
+
+        if ($chatType === 'gang' && !Auth::user()->gang_id) {
+            abort(403, 'User has no gang');
+        }
+
         $message = ChatMessage::create([
             'user_id' => Auth::user()->id,
             'chat_type' => $request->chat_type,
