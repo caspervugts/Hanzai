@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.getElementById('chat-room-header');
     let lastMessageCount = 0;
     let unreadCount = 0;
+    let initialized = false;
     const headerTitle = header.querySelector('span');
 
 
@@ -154,36 +155,44 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch('/chat/messages');
             const data = await res.json();
-            const newMessages = data.length - lastMessageCount;
-            const shouldScroll = !minimized && isNearBottom();
 
+            // Eerste load = alleen initialiseren
+            if (!initialized) {
+                lastMessageCount = data.length;
+                initialized = true;
+            } else {
+                if (minimized && data.length > lastMessageCount) {
+                    unreadCount += data.length - lastMessageCount;
+                    header.classList.add('chat-blink');
+                    headerTitle.textContent = `Chat (${unreadCount})`;
+                }
+
+                lastMessageCount = data.length;
+            }
+
+            // Render messages
             messagesDiv.innerHTML = data.map(m => {
-                const typename = (m.chat_type === 'gang') ? `${m.user.gang.name}` : 'All';
+                const typename = (m.chat_type === 'gang') ? m.user.gang?.name ?? 'Gang' : 'All';
                 const color = (m.chat_type === 'gang') ? '#BC002D' : 'black';
                 return `
                     <div style="color:${color}">
-                        ${m.created_at} - 
-                        <strong>${m.user.name} (${typename}):</strong> 
+                        ${m.created_at} -
+                        <strong>${m.user.name} (${typename}):</strong>
                         ${m.message}
                     </div>
                 `;
             }).join('');
 
-            if (newMessages > 0 && minimized) {
-                unreadCount += newMessages;
-                header.classList.add('chat-blink');
-                headerTitle.textContent = `Chat (${unreadCount})`;
-            }
-
-            lastMessageCount = data.length;
-            
-            if (shouldScroll) {
+            // Alleen autoscroll als chat open is
+            if (!minimized) {
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
+
         } catch (err) {
             console.error('Error fetching messages', err);
         }
     }
+
 
     fetchMessages().then(() => {
         lastMessageCount = messagesDiv.children.length;
